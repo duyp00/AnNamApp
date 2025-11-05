@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val db = Room.databaseBuilder( applicationContext, AnNamDatabase::class.java, "myapp_database" ).build()
+        val db = Room.databaseBuilder(applicationContext, AnNamDatabase::class.java, "myapp_database").build()
         val userDao = db.flashCardDao()
 
         lifecycleScope.launch {
