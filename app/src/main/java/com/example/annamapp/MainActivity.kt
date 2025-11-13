@@ -16,6 +16,7 @@ class MainActivity : ComponentActivity() {
         val db = Room.databaseBuilder(applicationContext, AnNamDatabase::class.java, "myapp_database").build()
         val userDao = db.flashCardDao()
 
+        /*
         lifecycleScope.launch {
             userDao.insertAll(FlashCard(
                 uid = 0,
@@ -25,9 +26,10 @@ class MainActivity : ComponentActivity() {
             val users: List<FlashCard> = userDao.getAll()
             Log.d("AnNam", users.toString())
         }
+         */
 
         setContent {
-            CardStudyApp()
+            CardStudyApp(userDao)
         }
     }
 }

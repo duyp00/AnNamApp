@@ -19,13 +19,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.annamapp.FlashCardDao
 import com.example.annamapp.R
 import com.example.annamapp.navigation.AppNavHost
 import com.example.annamapp.navigation.Routes
 
 @OptIn(ExperimentalMaterial3Api::class) // Required for TopAppBar
 @Composable
-fun CardStudyApp() {
+fun CardStudyApp(
+    userDao: FlashCardDao
+) {
     val navController = rememberNavController()
 
     // observe current route to know when to show the Back button
@@ -65,6 +68,7 @@ fun CardStudyApp() {
     ) { innerPadding ->
         // Place the navHost inside the Scaffold content area
         AppNavHost(
+            userDao = userDao,
             onMessageChange = {message = it},
             navCtrller = navController,
             startDestnt = Routes.HOME,
@@ -89,6 +93,6 @@ private fun titleForRoute(route: String) = when (route) {
 fun PreviewApp() {
     // It's a good practice to wrap previews inside theme
     // M3 theme {
-    CardStudyApp()
+    //CardStudyApp()
     // }
 }

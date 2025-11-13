@@ -9,6 +9,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
@@ -26,9 +27,9 @@ fun HomeScreen(
     onNavigateToSearch: () -> Unit,
     onMessageChange: (String) -> Unit = {}
 ) {
-    //LaunchedEffect(Unit) {
+    LaunchedEffect(Unit) {
         onMessageChange("this is home screen")
-    //}
+    }
     Column(
         modifier = Modifier
             .padding(24.dp)

@@ -10,6 +10,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,9 +23,9 @@ import androidx.compose.ui.unit.dp
 fun SearchScreen(
     onMessageChange: (String) -> Unit = {}
 ) {
-    //LaunchedEffect(Unit) {
-    onMessageChange("search by english or vietnamese word")
-    //}
+    LaunchedEffect(Unit) {
+        onMessageChange("search by english or vietnamese word")
+    }
     var query by remember { mutableStateOf("") }
     Column(
         Modifier
