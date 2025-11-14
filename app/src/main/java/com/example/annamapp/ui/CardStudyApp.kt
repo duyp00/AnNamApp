@@ -85,6 +85,7 @@ private fun titleForRoute(route: String) = when (route) {
     Routes.STUDY -> "Study Cards"
     Routes.ADD -> "Add a Card"
     Routes.SEARCH -> "Search Cards"
+    Routes.CARD_DETAIL -> "Card Details"
     else -> "New screen"
 }
 
