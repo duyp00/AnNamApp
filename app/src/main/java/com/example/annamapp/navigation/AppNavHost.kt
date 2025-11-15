@@ -62,14 +62,13 @@ fun AppNavHost(
             SearchScreen(
                 getAllCards = getAllCards,
                 onMessageChange = onMessageChange,
-                onCardClick = { cardId ->
+                onCardClick = {
                     // Navigate to the detail screen, passing the card's ID
-                    navCtrller.navigate("${Routes.CARD_DETAIL}/$cardId")
+                    navCtrller.navigate("${Routes.CARD_DETAIL}/$it") //or cardID -> navCtrller.navigate("${Routes.CARD_DETAIL}/$cardID")
                 }
             )
         }
 
-        // New composable for the Card Detail/Delete screen
         composable(
             route = "${Routes.CARD_DETAIL}/{${Routes.CARD_ID_ARG}}", // e.g., "card_detail/5"
             arguments = listOf(navArgument(Routes.CARD_ID_ARG) { type = NavType.IntType })

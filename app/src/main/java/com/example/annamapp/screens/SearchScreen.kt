@@ -1,5 +1,6 @@
 package com.example.annamapp.screens
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.annamapp.FlashCard
@@ -39,9 +39,9 @@ fun SearchScreen(
     var cardList by remember { mutableStateOf<List<FlashCard>>(emptyList()) }
 
     // LaunchedEffect runs this suspend block when the composable first appears.
-    // It will fetch all cards and update the cardList state.
-    // The key 'Unit' means this effect runs only once.
-    LaunchedEffect(key1 = Unit) {
+    // It will fetch all cards and update the cardList state. key1 = Unit means this effect runs only once.
+    // i'm testing key1 = null to see what happens
+    LaunchedEffect(key1 = null) {
         onMessageChange("Click on a card to see details")
         cardList = getAllCards()
     }
@@ -55,28 +55,18 @@ fun SearchScreen(
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            // 'items' loops through our cardList
-            items(cardList, key = { it.uid }) { card ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .clickable {
-                            // When clicked, navigate to the detail screen using the card's unique ID.
-                            onCardClick(card.uid)
-                        },
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            // 'items' loops through all cards in cardList, creating a Card composable for each.
+            items(items = cardList, key = { it.uid }) { card ->
+                Row(
+                    modifier = Modifier.fillMaxWidth().border(width = 1.dp, color = Color.LightGray).padding(16.dp)
+                                       .clickable { // When clicked, navigate to the detail screen using the card's unique ID.
+                                           onCardClick(card.uid)
+                                       }
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        // Display the card content as shown in the video (e.g., "test1 = test2")
-                        Text(
-                            text = "${card.englishCard ?: ""} = ${card.vietnameseCard ?: ""}"
-                        )
-                    }
+                    // Display the card content (e.g., "test1 = test2")
+                    Text(
+                        text = "${card.englishCard ?: ""} = ${card.vietnameseCard ?: ""}"
+                    )
                 }
             }
         }

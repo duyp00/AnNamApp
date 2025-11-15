@@ -43,9 +43,9 @@ fun CardDetailScreen(
     // Coroutine scope to run the delete operation.
     val scope = rememberCoroutineScope()
 
-    // This effect runs when 'cardId' changes (or on first load).
-    // It fetches the specific card from the database.
-    LaunchedEffect(key1 = cardId) {
+    // This effect runs when 'cardId' changes, or on first load (key1 = cardId). It fetches the specific card from the database.
+    //CardDetailScreen is launched via route navigation, no need to watch cardId changes? (just key1 = Unit instead?)
+    LaunchedEffect(key1 = Unit) {
         card = getCardById(cardId)
         if (card != null) {
             onMessageChange("Card details")
@@ -66,7 +66,7 @@ fun CardDetailScreen(
                 onValueChange = {},
                 label = { Text("en") },
                 modifier = Modifier.fillMaxWidth(),
-                readOnly = true // As seen in the video, the fields are not editable
+                //readOnly = true
             )
             Spacer(Modifier.height(12.dp))
             OutlinedTextField(
@@ -74,7 +74,7 @@ fun CardDetailScreen(
                 onValueChange = {},
                 label = { Text("vn") },
                 modifier = Modifier.fillMaxWidth(),
-                readOnly = true
+                //readOnly = true
             )
             Spacer(Modifier.height(24.dp))
             Button(onClick = {
@@ -87,7 +87,7 @@ fun CardDetailScreen(
                 Text("Delete")
             }
         } ?: run {
-            // Show a loading message while the card is being fetched.
+            // Show a loading message while the card is being fetched. optional
             if (card == null) {
                 Text("Loading card details...")
             }
