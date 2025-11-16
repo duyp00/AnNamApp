@@ -19,6 +19,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+// We no longer need this import here, as it was causing the crash
+// import androidx.navigation.toRoute
 import com.example.annamapp.FlashCardDao
 import com.example.annamapp.R
 import com.example.annamapp.navigation.AppNavHost
@@ -31,10 +33,23 @@ fun CardStudyApp(
 ) {
     val navController = rememberNavController()
 
-    // observe current route to know when to show the Back button
+    // --- FIX: Use string-based routes for Scaffold logic ---
+
+    // 1. Get the qualified name of the home route. This is our default.
+    // e.g., "com.example.annamapp.navigation.Routes.Home"
+    val homeRouteString = Routes.Home::class.qualifiedName!!
+
+    // 2. Observe the nav back stack entry
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route ?: Routes.HOME
-    val showBack = currentRoute != Routes.HOME
+
+    // 3. Get the current route as a STRING. Default to home.
+    val currentRouteString = navBackStackEntry?.destination?.route ?: homeRouteString
+
+    // 4. Compare strings to determine if the back button should be shown.
+    val showBack = currentRouteString != homeRouteString
+
+    // --- END FIX ---
+
     var message by rememberSaveable { mutableStateOf("") }
 
     // Top-level Scaffold
@@ -43,8 +58,8 @@ fun CardStudyApp(
             TopAppBar(
                 title = {
                     Text(
-                        text = titleForRoute(currentRoute),
-                        //unique test tag to avoid ambiguity during testing
+                        // 5. Pass the current route STRING to the title helper
+                        text = titleForRoute(currentRouteString),
                         modifier = Modifier.testTag("screen_title")
                     )
                 },
@@ -52,12 +67,11 @@ fun CardStudyApp(
                     {
                         TextButton(
                             onClick = { navController.navigateUp() },
-                            //unique test tag to avoid ambiguity during testing
                             modifier = Modifier.testTag("back_button"),
                             content = { Text(stringResource(R.string.back_button_label)) }
-                        )// or trailing lambda syntax for last param
+                        )
                     }
-                } else { {} /*Provide an empty lambda if not showing the icon*/}
+                } else { {} }
             )
         },
         bottomBar = {
@@ -66,12 +80,11 @@ fun CardStudyApp(
             }
         }
     ) { innerPadding ->
-        // Place the navHost inside the Scaffold content area
         AppNavHost(
             userDao = userDao,
             onMessageChange = {message = it},
             navCtrller = navController,
-            startDestnt = Routes.HOME,
+            startDestnt = Routes.Home, // Pass the type-safe object here
             modder = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
@@ -79,20 +92,29 @@ fun CardStudyApp(
     }
 }
 
-//@Composable
-private fun titleForRoute(route: String) = when (route) {
-    Routes.HOME -> "Home"
-    Routes.STUDY -> "Study Cards"
-    Routes.ADD -> "Add a Card"
-    Routes.SEARCH -> "Search Cards"
-    Routes.CARD_DETAIL -> "Card Details"
-    else -> "New screen"
+// --- FIX: Update helper function to work with route strings ---
+@Composable
+private fun titleForRoute(route: String): String {
+    // Compare the route string against the qualified name of each route class
+    return when {
+        route == Routes.Home::class.qualifiedName -> "Home"
+        route == Routes.Study::class.qualifiedName -> "Study Cards"
+        route == Routes.Add::class.qualifiedName -> "Add a Card"
+        route == Routes.Search::class.qualifiedName -> "Search Cards"
+
+        // For routes with arguments (like CardDetail), the route string will be
+        // "com.example...Routes.CardDetail/{cardId}"
+        // So we check if the string *starts with* the class name.
+        route.startsWith(Routes.CardDetail::class.qualifiedName!!) -> "Card Details"
+
+        else -> "New screen"
+    }
 }
+// --- END FIX ---
 
 @Preview(/*showBackground = true*/)
 @Composable
 fun PreviewApp() {
-    // It's a good practice to wrap previews inside theme
     // M3 theme {
     //CardStudyApp()
     // }

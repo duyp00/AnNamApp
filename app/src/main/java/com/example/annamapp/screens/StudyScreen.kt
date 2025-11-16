@@ -34,6 +34,6 @@ fun StudyScreen(
 fun PreviewStudyScreen() {
     // It's a good practice to wrap previews inside theme
     // M3 theme {
-    StudyScreen()
+    //StudyScreen()
     // }
 }

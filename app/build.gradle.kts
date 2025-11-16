@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -142,14 +143,13 @@ dependencies {
 
     implementation(libs.androidx.room.ktx)
 
-
+    implementation("androidx.navigation:navigation-compose:2.9.6") // Ensure you have a recent version
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
     // optional - Test helpers
 
     // testImplementation(libs.androidx.room.testing)
 
     // testImplementation(kotlin("test"))
-
-
 
 }

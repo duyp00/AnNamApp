@@ -3,11 +3,10 @@ package com.example.annamapp.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.example.annamapp.FlashCard
 import com.example.annamapp.FlashCardDao
 import com.example.annamapp.screens.AddCardScreen
@@ -20,14 +19,14 @@ import com.example.annamapp.screens.StudyScreen
 fun AppNavHost(
     userDao: FlashCardDao,
     navCtrller: NavHostController = rememberNavController(),
-    modder: Modifier,      //i'm testing no default value for modifier param yet
-    startDestnt: String = Routes.HOME,  //default start screen is home
+    modder: Modifier,
+    // The start destination is now a type-safe object, not a String
+    startDestnt: Routes = Routes.Home,
     onMessageChange: (String) -> Unit = {}
 ) {
-    // Define lambdas for database operations.
-    // This is good practice as it keeps database logic out of the NavHost.
+    // Define lambdas for database operations. (This part remains the same)
     val insertFlashCard: suspend (FlashCard) -> Unit = {
-        userDao.insertAll(it) // or flashCard -> userDao.insertAll(flashCard)
+        userDao.insertAll(it)
     }
     val getAllCards: suspend () -> List<FlashCard> = {
         userDao.getAll()
@@ -39,55 +38,55 @@ fun AppNavHost(
         userDao.delete(it)
     }
 
+    // The startDestination parameter now takes the Routes.Home object directly
     NavHost(navController = navCtrller, startDestination = startDestnt, modifier = modder) {
-        composable(startDestnt) {
+
+        // Use composable<T> for type-safe destinations without arguments
+        composable<Routes.Home> {
             HomeScreen(
-                onNavigateToStudy = { navCtrller.navigate(Routes.STUDY) },
-                onNavigateToAdd = { navCtrller.navigate(Routes.ADD) },
-                onNavigateToSearch = { navCtrller.navigate(Routes.SEARCH) },
+                // Navigate by passing the destination object
+                onNavigateToStudy = { navCtrller.navigate(Routes.Study) },
+                onNavigateToAdd = { navCtrller.navigate(Routes.Add) },
+                onNavigateToSearch = { navCtrller.navigate(Routes.Search) },
                 onMessageChange = onMessageChange
             )
         }
 
-        composable(Routes.STUDY) {
+        composable<Routes.Study> {
             StudyScreen(onMessageChange = onMessageChange)
         }
 
-        composable(Routes.ADD) {
+        composable<Routes.Add> {
             AddCardScreen(onMessageChange = onMessageChange, insertFlashCard = insertFlashCard)
         }
 
-        // Updated composable for the Search/View All screen
-        composable(Routes.SEARCH) {
+        composable<Routes.Search> {
             SearchScreen(
                 getAllCards = getAllCards,
                 onMessageChange = onMessageChange,
-                onCardClick = {
-                    // Navigate to the detail screen, passing the card's ID
-                    navCtrller.navigate("${Routes.CARD_DETAIL}/$it") //or cardID -> navCtrller.navigate("${Routes.CARD_DETAIL}/$cardID")
+                onCardClick = { cardId ->
+                    // Navigate with arguments by passing an instance of the data class
+                    navCtrller.navigate(Routes.CardDetail(cardId = cardId))
                 }
             )
         }
 
-        composable(
-            route = "${Routes.CARD_DETAIL}/{${Routes.CARD_ID_ARG}}", // e.g., "card_detail/5"
-            arguments = listOf(navArgument(Routes.CARD_ID_ARG) { type = NavType.IntType })
-        ) { backStackEntry ->
-            // Extract the card ID from the navigation arguments
-            val cardId = backStackEntry.arguments?.getInt(Routes.CARD_ID_ARG)
-            if (cardId != null) {
-                CardDetailScreen(
-                    getCardById = getCardById,
-                    deleteCard = deleteCard,
-                    cardId = cardId,
-                    onNavigateBack = { navCtrller.popBackStack() }, // Simple navigate back
-                    onMessageChange = onMessageChange
-                )
-            } else {
-                // Handle the case where ID is missing (shouldn't happen, but safe to have)
-                navCtrller.popBackStack()
-            }
-        }
+        // Use composable<T> for destinations WITH arguments
+        // No need to define "route" strings or "arguments" lists anymore!
+        composable<Routes.CardDetail> { backStackEntry ->
+            // Retrieve the type-safe arguments object
+            // No more manual parsing of backStackEntry.arguments!
+            val args = backStackEntry.toRoute<Routes.CardDetail>()
 
+            CardDetailScreen(
+                getCardById = getCardById,
+                deleteCard = deleteCard,
+                cardId = args.cardId, // Access arguments directly
+                onNavigateBack = { navCtrller.popBackStack() },
+                onMessageChange = onMessageChange
+            )
+            // The 'else' case for a missing ID is no longer needed,
+            // as navigation will fail at compile time if you don't provide a cardId.
+        }
     }
 }

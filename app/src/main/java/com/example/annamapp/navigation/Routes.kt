@@ -1,11 +1,43 @@
 package com.example.annamapp.navigation
 
-object Routes {
-    const val HOME = "home"
-    const val STUDY = "study"
-    const val ADD = "add"
-    const val SEARCH = "search"
+import kotlinx.serialization.Serializable
 
-    const val CARD_DETAIL = "card_detail" // Screen to show details of one card
-    const val CARD_ID_ARG = "cardId"      // Argument name for passing the card's ID
+/**
+ * Defines all possible navigation destinations in the app in a type-safe manner.
+ * Using @Serializable allows navigation to pass these objects as arguments.
+ */
+@Serializable
+sealed interface Routes {
+    /**
+     * Home screen. No arguments.
+     * We use a 'data object' for simplicity as it's a singleton.
+     */
+    @Serializable
+    data object Home : Routes
+
+    /**
+     * Study screen. No arguments.
+     */
+    @Serializable
+    data object Study : Routes
+
+    /**
+     * Add Card screen. No arguments.
+     */
+    @Serializable
+    data object Add : Routes
+
+    /**
+     * Search/View All screen. No arguments.
+     */
+    @Serializable
+    data object Search : Routes
+
+    /**
+     * Card Detail screen.
+     * @param cardId The unique ID of the card to display.
+     * This is a 'data class' because it carries data.
+     */
+    @Serializable
+    data class CardDetail(val cardId: Int) : Routes
 }
