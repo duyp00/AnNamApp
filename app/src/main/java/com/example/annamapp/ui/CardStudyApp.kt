@@ -37,13 +37,13 @@ fun CardStudyApp(
 
     // 1. Get the qualified name of the home route. This is our default.
     // e.g., "com.example.annamapp.navigation.Routes.Home"
-    val homeRouteString = Routes.Home::class.qualifiedName!!
+    val homeRouteString = Routes.Home::class.qualifiedName
 
     // 2. Observe the nav back stack entry
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     // 3. Get the current route as a STRING. Default to home.
-    val currentRouteString = navBackStackEntry?.destination?.route ?: homeRouteString
+    val currentRouteString = navBackStackEntry?.destination?.route
 
     // 4. Compare strings to determine if the back button should be shown.
     val showBack = currentRouteString != homeRouteString
@@ -94,7 +94,7 @@ fun CardStudyApp(
 
 // --- FIX: Update helper function to work with route strings ---
 @Composable
-private fun titleForRoute(route: String): String {
+private fun titleForRoute(route: String?): String {
     // Compare the route string against the qualified name of each route class
     return when {
         route == Routes.Home::class.qualifiedName -> "Home"
@@ -105,7 +105,7 @@ private fun titleForRoute(route: String): String {
         // For routes with arguments (like CardDetail), the route string will be
         // "com.example...Routes.CardDetail/{cardId}"
         // So we check if the string *starts with* the class name.
-        route.startsWith(Routes.CardDetail::class.qualifiedName!!) -> "Card Details"
+        route?.startsWith(Routes.CardDetail::class.qualifiedName!!) == true -> "Card Details"
 
         else -> "New screen"
     }

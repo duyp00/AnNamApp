@@ -21,7 +21,7 @@ fun AppNavHost(
     navCtrller: NavHostController = rememberNavController(),
     modder: Modifier,
     // The start destination is now a type-safe object, not a String
-    startDestnt: Routes = Routes.Home,
+    startDestnt: Routes, //= Routes.Home,
     onMessageChange: (String) -> Unit = {}
 ) {
     // Define lambdas for database operations. (This part remains the same)
