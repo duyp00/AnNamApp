@@ -12,21 +12,72 @@ interface FlashCardDao {
     suspend fun getAll(): List<FlashCard>
 
     @Query("SELECT * FROM FlashCards WHERE uid IN (:flashCardIds)")
-    suspend fun loadAllByIds(flashCardIds: IntArray): List<FlashCard>
+    suspend fun loadAllByIds(flashCardIds: IntArray): List<FlashCard>?
 
     /**
-     * Finds a single card by its unique ID (uid).
-     * This is new and will be used for the detail/delete screen.
+     * Finds a single card by its unique ID (uid), used for the detail/delete screen.
      */
     @Query("SELECT * FROM FlashCards WHERE uid = :uid LIMIT 1")
     suspend fun getCardById(uid: Int): FlashCard?
 
-    @Query("SELECT * FROM FlashCards WHERE english_card LIKE :english AND " +
-            "vietnamese_card LIKE :vietnamese LIMIT 1")
-    suspend fun findByCards(english: String, vietnamese: String): FlashCard
+    @Query("SELECT * FROM FlashCards WHERE english_card LIKE :english AND " + //+ here is concatenation, nothing to do with sql
+            "vietnamese_card LIKE :vietnamese")
+    suspend fun findByCards(english: String, vietnamese: String): List<FlashCard>?
+
+    /**
+     * Search cards with partial match on both fields (OR logic).
+     * Returns cards where either English OR Vietnamese field matches.
+     * Empty queries are ignored.
+     */
+    @Query("SELECT * FROM FlashCards WHERE " +
+            "(:englishQuery != '' AND english_card LIKE '%' || :englishQuery || '%') OR " +
+            "(:vietnameseQuery != '' AND vietnamese_card LIKE '%' || :vietnameseQuery || '%')")
+    suspend fun searchCardsPartial(
+        englishQuery: String,
+        vietnameseQuery: String
+    ): List<FlashCard>
+
+    /**
+     * Search cards with exact English, partial Vietnamese (OR logic).
+     * Returns cards where either English OR Vietnamese field matches.
+     * Empty queries are ignored.
+     */
+    @Query("SELECT * FROM FlashCards WHERE " +
+            "(:englishQuery != '' AND english_card = :englishQuery) OR " +
+            "(:vietnameseQuery != '' AND vietnamese_card LIKE '%' || :vietnameseQuery || '%')")
+    suspend fun searchCardsExactEnglish(
+        englishQuery: String,
+        vietnameseQuery: String
+    ): List<FlashCard>
+
+    /**
+     * Search cards with partial English, exact Vietnamese (OR logic).
+     * Returns cards where either English OR Vietnamese field matches.
+     * Empty queries are ignored.
+     */
+    @Query("SELECT * FROM FlashCards WHERE " +
+            "(:englishQuery != '' AND english_card LIKE '%' || :englishQuery || '%') OR " +
+            "(:vietnameseQuery != '' AND vietnamese_card = :vietnameseQuery)")
+    suspend fun searchCardsExactVietnamese(
+        englishQuery: String,
+        vietnameseQuery: String
+    ): List<FlashCard>
+
+    /**
+     * Search cards with exact match on both fields (OR logic).
+     * Returns cards where either English OR Vietnamese field matches.
+     * Empty queries are ignored.
+     */
+    @Query("SELECT * FROM FlashCards WHERE " +
+            "(:englishQuery != '' AND english_card = :englishQuery) OR " +
+            "(:vietnameseQuery != '' AND vietnamese_card = :vietnameseQuery)")
+    suspend fun searchCardsExactBoth(
+        englishQuery: String,
+        vietnameseQuery: String
+    ): List<FlashCard>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertAll(vararg flashCard: FlashCard)
+    suspend fun insertCard(vararg flashCard: FlashCard)
 
     /**
      * Deletes a card.

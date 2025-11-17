@@ -26,7 +26,7 @@ fun AppNavHost(
 ) {
     // Define lambdas for database operations. (This part remains the same)
     val insertFlashCard: suspend (FlashCard) -> Unit = {
-        userDao.insertAll(it)
+        userDao.insertCard(it)
     }
     val getAllCards: suspend () -> List<FlashCard> = {
         userDao.getAll()
