@@ -43,9 +43,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
-    }
+
     buildFeatures {
         compose = true
     }
@@ -113,7 +111,7 @@ dependencies {
     testImplementation(libs.junit)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
-    //testImplementation(libs.robolectric)
+    testImplementation(libs.robolectric)
 
     // Needed for createComposeRule(), but not for createAndroidComposeRule<YourActivity>():
 
@@ -143,7 +141,7 @@ dependencies {
 
     implementation(libs.androidx.room.ktx)
 
-    implementation("androidx.navigation:navigation-compose:2.9.6") // Ensure you have a recent version
+    implementation(libs.androidx.navigation.compose) // Ensure you have a recent version
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
     // optional - Test helpers

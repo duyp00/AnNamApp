@@ -21,8 +21,8 @@ interface FlashCardDao {
     suspend fun getCardById(uid: Int): FlashCard?
 
     @Query("SELECT * FROM FlashCards WHERE english_card LIKE :english AND " + //+ here is concatenation, nothing to do with sql
-            "vietnamese_card LIKE :vietnamese")
-    suspend fun findByCards(english: String, vietnamese: String): List<FlashCard>?
+            "vietnamese_card LIKE :vietnamese LIMIT 1")
+    suspend fun findByCards(english: String, vietnamese: String): FlashCard?
 
     /**
      * Search cards with partial match on both fields (OR logic).

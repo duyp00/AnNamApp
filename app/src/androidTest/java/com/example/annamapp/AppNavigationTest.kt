@@ -32,7 +32,7 @@ class AppNavigationTest {
         composeTestRule.setContent {
             AppNavHost(
                 navCtrller = navController,
-                startDestnt = Routes.HOME,
+                startDestnt = Routes.Home,
                 modder = Modifier,
             )
         }
