@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import com.example.annamapp.FlashCard
+import com.example.annamapp.room_sqlite_db.FlashCard
 import com.example.annamapp.R
 import kotlinx.coroutines.launch
 

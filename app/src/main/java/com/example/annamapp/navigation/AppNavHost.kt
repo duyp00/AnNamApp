@@ -7,8 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.annamapp.FlashCard
-import com.example.annamapp.FlashCardDao
+import com.example.annamapp.room_sqlite_db.FlashCard
+import com.example.annamapp.room_sqlite_db.FlashCardDao
 import com.example.annamapp.screens.AddCardScreen
 import com.example.annamapp.screens.CardDetailScreen
 import com.example.annamapp.screens.HomeScreen
@@ -17,7 +17,7 @@ import com.example.annamapp.screens.StudyScreen
 
 @Composable
 fun AppNavHost(
-    userDao: FlashCardDao,
+    flashCardDao: FlashCardDao,
     navCtrller: NavHostController = rememberNavController(),
     modder: Modifier,
     // The start destination is now a type-safe object, not a String
@@ -26,19 +26,19 @@ fun AppNavHost(
 ) {
     // Define lambdas for database operations.
     val insertFlashCard: suspend (FlashCard) -> Unit = {
-        userDao.insertCard(it)
+        flashCardDao.insertCard(it)
     }
     val updateFlashCard: suspend (FlashCard) -> Unit = {
-        userDao.updateCard(it)
+        flashCardDao.updateCard(it)
     }
     val getAllCards: suspend () -> List<FlashCard> = {
-        userDao.getAll()
+        flashCardDao.getAll()
     }
     val getCardById: suspend (Int) -> FlashCard? = {
-        userDao.getCardById(it)
+        flashCardDao.getCardById(it)
     }
     val deleteCard: suspend (FlashCard) -> Unit = {
-        userDao.delete(it)
+        flashCardDao.delete(it)
     }
 
     // The startDestination parameter now takes the Routes.Home object directly

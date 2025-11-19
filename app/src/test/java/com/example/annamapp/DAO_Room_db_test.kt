@@ -4,6 +4,9 @@ import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import com.example.annamapp.room_sqlite_db.AnNamDatabase
+import com.example.annamapp.room_sqlite_db.FlashCard
+import com.example.annamapp.room_sqlite_db.FlashCardDao
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -48,7 +51,7 @@ class DaoTest {
             flashCardDao.insertCard(flashCard)
         }
 
-        val item:FlashCard
+        val item: FlashCard
         runBlocking {
             item = flashCardDao.findByCards("test_english", "test_vietnamese")!!
         }

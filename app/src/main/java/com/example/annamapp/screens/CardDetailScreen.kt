@@ -21,7 +21,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.annamapp.FlashCard
+import com.example.annamapp.room_sqlite_db.FlashCard
 import kotlinx.coroutines.launch
 
 /**

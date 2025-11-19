@@ -1,4 +1,4 @@
-package com.example.annamapp
+package com.example.annamapp.room_sqlite_db
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

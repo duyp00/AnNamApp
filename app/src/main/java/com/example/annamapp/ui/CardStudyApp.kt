@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.annamapp.FlashCardDao
+import com.example.annamapp.room_sqlite_db.FlashCardDao
 import com.example.annamapp.R
 import com.example.annamapp.navigation.AppNavHost
 import com.example.annamapp.navigation.Routes
@@ -28,7 +28,7 @@ import com.example.annamapp.navigation.Routes
 @OptIn(ExperimentalMaterial3Api::class) // Required for TopAppBar
 @Composable
 fun CardStudyApp(
-    userDao: FlashCardDao
+    flashCardDao: FlashCardDao
 ) {
     val navController = rememberNavController()
 
@@ -80,7 +80,7 @@ fun CardStudyApp(
         }
     ) { innerPadding ->
         AppNavHost(
-            userDao = userDao,
+            flashCardDao = flashCardDao,
             onMessageChange = {message = it},
             navCtrller = navController,
             startDestnt = Routes.Home, // Pass the type-safe object here
