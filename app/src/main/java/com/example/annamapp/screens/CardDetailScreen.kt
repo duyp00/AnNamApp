@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 fun CardDetailScreen(
     getCardById: suspend (Int) -> FlashCard?,
     updateCard: suspend (FlashCard) -> Unit,
-    deleteCard: suspend (FlashCard) -> Unit,
+    //deleteCard: suspend (FlashCard) -> Unit,
     cardId: Int,
     //onNavigateBack: () -> Unit,
     onMessageChange: (String) -> Unit

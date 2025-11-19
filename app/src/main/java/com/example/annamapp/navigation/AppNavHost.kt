@@ -83,7 +83,7 @@ fun AppNavHost(
             CardDetailScreen(
                 getCardById = getCardById,
                 updateCard = updateFlashCard,
-                deleteCard = deleteCard,
+                //deleteCard = deleteCard,
                 cardId = args.cardId, // Access arguments directly
                 //onNavigateBack = { navCtrller.popBackStack() },
                 onMessageChange = onMessageChange
