@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface FlashCardDao {
@@ -85,4 +86,7 @@ interface FlashCardDao {
      */
     @Delete
     suspend fun delete(flashCard: FlashCard)
+
+    @Update
+    suspend fun updateCard(flashCard: FlashCard)
 }

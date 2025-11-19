@@ -1,5 +1,7 @@
 package com.example.annamapp.ui
 
+// We no longer need this import here, as it was causing the crash
+// import androidx.navigation.toRoute
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomAppBar
@@ -16,11 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-// We no longer need this import here, as it was causing the crash
-// import androidx.navigation.toRoute
 import com.example.annamapp.FlashCardDao
 import com.example.annamapp.R
 import com.example.annamapp.navigation.AppNavHost
@@ -111,11 +110,3 @@ private fun titleForRoute(route: String?): String {
     }
 }
 // --- END FIX ---
-
-@Preview(/*showBackground = true*/)
-@Composable
-fun PreviewApp() {
-    // M3 theme {
-    //CardStudyApp()
-    // }
-}

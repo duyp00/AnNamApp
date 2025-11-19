@@ -8,7 +8,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun StudyScreen(
@@ -27,13 +26,4 @@ fun StudyScreen(
             textAlign = TextAlign.Center
         )
     }
-}
-
-@Preview(/*showBackground = true*/)
-@Composable
-fun PreviewStudyScreen() {
-    // It's a good practice to wrap previews inside theme
-    // M3 theme {
-    //StudyScreen()
-    // }
 }

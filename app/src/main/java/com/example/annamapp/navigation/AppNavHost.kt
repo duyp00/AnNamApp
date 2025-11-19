@@ -24,9 +24,12 @@ fun AppNavHost(
     startDestnt: Routes, //= Routes.Home,
     onMessageChange: (String) -> Unit = {}
 ) {
-    // Define lambdas for database operations. (This part remains the same)
+    // Define lambdas for database operations.
     val insertFlashCard: suspend (FlashCard) -> Unit = {
         userDao.insertCard(it)
+    }
+    val updateFlashCard: suspend (FlashCard) -> Unit = {
+        userDao.updateCard(it)
     }
     val getAllCards: suspend () -> List<FlashCard> = {
         userDao.getAll()
@@ -63,8 +66,9 @@ fun AppNavHost(
         composable<Routes.Search> {
             SearchScreen(
                 getAllCards = getAllCards,
+                deleteCard = deleteCard,
                 onMessageChange = onMessageChange,
-                onCardClick = { cardId ->
+                onEditClick = { cardId ->
                     // Navigate with arguments by passing an instance of the data class
                     navCtrller.navigate(Routes.CardDetail(cardId = cardId))
                 }
@@ -72,21 +76,18 @@ fun AppNavHost(
         }
 
         // Use composable<T> for destinations WITH arguments
-        // No need to define "route" strings or "arguments" lists anymore!
         composable<Routes.CardDetail> { backStackEntry ->
             // Retrieve the type-safe arguments object
-            // No more manual parsing of backStackEntry.arguments!
             val args = backStackEntry.toRoute<Routes.CardDetail>()
 
             CardDetailScreen(
                 getCardById = getCardById,
+                updateCard = updateFlashCard,
                 deleteCard = deleteCard,
                 cardId = args.cardId, // Access arguments directly
-                onNavigateBack = { navCtrller.popBackStack() },
+                //onNavigateBack = { navCtrller.popBackStack() },
                 onMessageChange = onMessageChange
             )
-            // The 'else' case for a missing ID is no longer needed,
-            // as navigation will fail at compile time if you don't provide a cardId.
         }
     }
 }

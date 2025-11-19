@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -70,21 +69,4 @@ fun HomeScreen(
             Text("Search Cards")
         }
     }
-}
-
-@Preview(/*showBackground = true*/)
-@Composable
-fun PreviewHomeScreen(
-    //navCtrller: NavHostController = rememberNavController()
-) {
-    // It's a good practice to wrap previews inside theme
-    // M3 theme {
-    /*
-    HomeScreen(
-        onNavigateToStudy = { navCtrller.navigate(Routes.STUDY) },
-        onNavigateToAdd = { navCtrller.navigate(Routes.ADD) },
-        onNavigateToSearch = { navCtrller.navigate(Routes.SEARCH) }
-    )
-     */
-    // }
 }

@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.annamapp.FlashCard
 import com.example.annamapp.R
 import kotlinx.coroutines.launch
@@ -74,13 +73,4 @@ fun AddCardScreen(
             { Text("Add") }
         }
     }
-}
-
-@Preview(/*showBackground = true*/)
-@Composable
-fun PreviewAddCardScreen() {
-    // It's a good practice to wrap previews inside theme
-    // M3 theme {
-    //AddCardScreen()
-    // }
 }

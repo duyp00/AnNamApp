@@ -1,11 +1,14 @@
 package com.example.annamapp.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -22,33 +25,42 @@ import com.example.annamapp.FlashCard
 import kotlinx.coroutines.launch
 
 /**
- * This is the new screen to show card details and allow deletion.
+ * This is the new screen to show card details, allow editing, and deletion.
  *
  * @param getCardById A suspend function to get a single card by its ID.
+ * @param updateCard A suspend function to update the card.
  * @param deleteCard A suspend function to delete a card.
  * @param cardId The unique ID of the card to display.
- * @param onNavigateBack A lambda function to navigate back after deletion.
+ * @param onNavigateBack A lambda function to navigate back.
  * @param onMessageChange A lambda to update the message in the bottom bar.
  */
 @Composable
 fun CardDetailScreen(
     getCardById: suspend (Int) -> FlashCard?,
+    updateCard: suspend (FlashCard) -> Unit,
     deleteCard: suspend (FlashCard) -> Unit,
     cardId: Int,
-    onNavigateBack: () -> Unit,
+    //onNavigateBack: () -> Unit,
     onMessageChange: (String) -> Unit
 ) {
-    // This state will hold the specific card we're looking at.
+    // This state will hold the specific card object from DB (for ID reference)
     var card by remember { mutableStateOf<FlashCard?>(null) }
-    // Coroutine scope to run the delete operation.
+
+    // Editable states for the text fields
+    var englishText by remember { mutableStateOf("") }
+    var vietnameseText by remember { mutableStateOf("") }
+
+    // Coroutine scope to run operations.
     val scope = rememberCoroutineScope()
 
-    // This effect runs when 'cardId' changes, or on first load (key1 = cardId). It fetches the specific card from the database.
-    //CardDetailScreen is launched via route navigation, no need to watch cardId changes? (just key1 = Unit instead?)
+    // Fetch card data
     LaunchedEffect(key1 = Unit) {
-        card = getCardById(cardId)
-        if (card != null) {
-            onMessageChange("Card details")
+        val fetchedCard = getCardById(cardId)
+        card = fetchedCard
+        if (fetchedCard != null) {
+            englishText = fetchedCard.englishCard ?: ""
+            vietnameseText = fetchedCard.vietnameseCard ?: ""
+            onMessageChange("Edit card details")
         } else {
             onMessageChange("Card not found")
         }
@@ -60,37 +72,67 @@ fun CardDetailScreen(
             .padding(24.dp)
     ) {
         // Only display the content if the card has been successfully loaded.
-        card?.let {
+        if (card != null) {
             OutlinedTextField(
-                value = it.englishCard ?: "",
-                onValueChange = {},
-                label = { Text("en") },
+                value = englishText,
+                onValueChange = { englishText = it },
+                label = { Text("English") },
                 modifier = Modifier.fillMaxWidth(),
-                //readOnly = true
+                singleLine = true
             )
             Spacer(Modifier.height(12.dp))
             OutlinedTextField(
-                value = it.vietnameseCard ?: "",
-                onValueChange = {},
-                label = { Text("vn") },
+                value = vietnameseText,
+                onValueChange = { vietnameseText = it },
+                label = { Text("Vietnamese") },
                 modifier = Modifier.fillMaxWidth(),
-                //readOnly = true
+                singleLine = true
             )
             Spacer(Modifier.height(24.dp))
-            Button(onClick = {
-                // Launch a coroutine to delete the card
-                scope.launch {
-                    deleteCard(it) // 'it' refers to the non-null 'card'
-                    onNavigateBack() // Go back to the list screen
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                /* // Delete Button
+                Button(
+                    onClick = {
+                        scope.launch {
+                            card?.let {
+                                deleteCard(it)
+                                onMessageChange("Card deleted")
+                                onNavigateBack()
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text("Delete")
+                } */
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // Save Button
+                Button(
+                    onClick = {
+                        scope.launch {
+                            // Create a copy of the current card with updated text
+                            val updatedCard = card!!.copy(
+                                englishCard = englishText,
+                                vietnameseCard = vietnameseText
+                            )
+                            updateCard(updatedCard)
+                            onMessageChange("Card saved")
+                            //onNavigateBack()
+                        }
+                    }
+                ) {
+                    Text("Save")
                 }
-            }) {
-                Text("Delete")
             }
-        } ?: run {
-            // Show a loading message while the card is being fetched. optional
-            if (card == null) {
-                Text("Loading card details...")
-            }
+        } else {
+            // Loading state
+            Text("Loading card details...")
         }
     }
 }
