@@ -44,7 +44,7 @@ fun FlashCardList(
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
-        refreshList() //fill the list when composing the LazyColumn
+        refreshList() //fill the cardList when composing the LazyColumn
         // 'items' loops through all cards in cardList, creating a Card composable for each.
         items(items = cardList, key = { it.uid }) { card ->
             Row(

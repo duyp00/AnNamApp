@@ -19,7 +19,7 @@ interface FlashCardDao {
      * Finds a single card by its unique ID (uid), used for the detail/delete screen.
      */
     @Query("SELECT * FROM FlashCards WHERE uid = :uid LIMIT 1")
-    suspend fun getCardById(uid: Int): FlashCard?
+    suspend fun getCardById(uid: Int?): FlashCard?
 
     @Query("SELECT * FROM FlashCards WHERE english_card LIKE :english AND " + //+ here is concatenation, nothing to do with sql
             "vietnamese_card LIKE :vietnamese LIMIT 1")

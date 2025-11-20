@@ -52,11 +52,13 @@ class DaoTest {
         }
 
         val item: FlashCard?
+        val item1: FlashCard?
         runBlocking {
             item = flashCardDao.findByCards("test_english", "test_vietnamese")
+            item1 = flashCardDao.getCardById(item?.uid)
         }
-        assertEquals(flashCard.englishCard, item?.englishCard)
-        assertEquals(flashCard.vietnameseCard, item?.vietnameseCard)
+        assertEquals(flashCard.englishCard, item1?.englishCard)
+        assertEquals(flashCard.vietnameseCard, item1?.vietnameseCard)
     }
 
     @Test

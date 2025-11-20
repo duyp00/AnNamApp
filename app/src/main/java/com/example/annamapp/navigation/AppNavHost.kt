@@ -34,7 +34,7 @@ fun AppNavHost(
     val getAllCards: suspend () -> List<FlashCard> = {
         flashCardDao.getAll()
     }
-    val getCardById: suspend (Int) -> FlashCard? = {
+    val getCardById: suspend (Int?) -> FlashCard? = {
         flashCardDao.getCardById(it)
     }
     val deleteCard: suspend (FlashCard) -> Unit = {

@@ -39,5 +39,5 @@ sealed interface Routes {
      * This is a 'data class' because it carries data.
      */
     @Serializable
-    data class CardDetail(val cardId: Int) : Routes
+    data class CardDetail(val cardId: Int?) : Routes
 }
