@@ -108,9 +108,9 @@ fun CardDetailScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                 ) {
                     Text("Delete")
-                } */
-
+                }
                 Spacer(modifier = Modifier.width(16.dp))
+                */
 
                 // Save Button
                 Button(
