@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -71,7 +70,7 @@ fun CardDetailScreen(
             .fillMaxSize()
             .padding(24.dp)
     ) {
-        // Only display the content if the card has been successfully loaded.
+        // Only display the content if the card has been fully loaded.
         if (card != null) {
             OutlinedTextField(
                 value = englishText,
@@ -116,7 +115,7 @@ fun CardDetailScreen(
                 Button(
                     onClick = {
                         scope.launch {
-                            // Create a copy of the current card with updated text
+                            // Create a new object with same ID but new properties
                             val updatedCard = card!!.copy(
                                 englishCard = englishText,
                                 vietnameseCard = vietnameseText

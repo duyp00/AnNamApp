@@ -26,7 +26,7 @@ fun AppNavHost(
 ) {
     // Define lambdas for database operations.
     val insertFlashCard: suspend (FlashCard) -> Unit = {
-        flashCardDao.insertCard(it)
+        flashCardDao.insertAll(it)
     }
     val updateFlashCard: suspend (FlashCard) -> Unit = {
         flashCardDao.updateCard(it)

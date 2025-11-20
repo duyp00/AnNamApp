@@ -77,16 +77,16 @@ interface FlashCardDao {
         vietnameseQuery: String
     ): List<FlashCard>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertCard(vararg flashCard: FlashCard)
+    @Insert(onConflict = OnConflictStrategy.IGNORE, entity = FlashCard::class)
+    suspend fun insertAll(vararg flashCard: FlashCard)
 
     /**
      * Deletes a card.
      * Making this a 'suspend' function to run it off the main thread.
      */
-    @Delete
+    @Delete(entity = FlashCard::class)
     suspend fun delete(flashCard: FlashCard)
 
-    @Update
+    @Update(entity = FlashCard::class)
     suspend fun updateCard(flashCard: FlashCard)
 }

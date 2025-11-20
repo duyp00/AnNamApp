@@ -48,7 +48,7 @@ class DaoTest {
             )
 
         runBlocking {
-            flashCardDao.insertCard(flashCard)
+            flashCardDao.insertAll(flashCard)
         }
 
         val item: FlashCard?
@@ -76,12 +76,12 @@ class DaoTest {
             )
 
         runBlocking {
-            flashCardDao.insertCard(flashCard)
+            flashCardDao.insertAll(flashCard)
         }
         var error = false
         runBlocking {
             try {
-                flashCardDao.insertCard(flashCard)
+                flashCardDao.insertAll(flashCard)
             } catch (e: SQLiteConstraintException){
                 error = true
             }
