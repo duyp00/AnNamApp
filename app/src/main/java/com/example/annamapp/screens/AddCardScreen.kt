@@ -25,7 +25,7 @@ fun AddCardScreen(
     insertFlashCard: suspend (FlashCard) -> Unit,
     onMessageChange: (String) -> Unit = {}
 ) {
-    LaunchedEffect(Unit) { //according to chatgpt i should use this but for now everything is still fine
+    LaunchedEffect(Unit) { //according to chatgpt i should use this
         onMessageChange("Add your cards now")
     }
     //var clickOnAdd by remember { mutableStateOf(false) }

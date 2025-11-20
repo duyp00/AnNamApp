@@ -107,7 +107,7 @@ fun SearchScreen(
     // LaunchedEffect runs this suspend block when the composable first appears.
     LaunchedEffect(key1 = Unit) {
         onMessageChange("Click Edit to modify, Delete to remove")
-        //refreshList() //either here or in the LazyColumn
+        //refreshList() //either here or in FlashCardList's LazyColumn
     }
 
     FlashCardList(
