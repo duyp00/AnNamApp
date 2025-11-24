@@ -32,9 +32,9 @@ fun AppNavHost(
     val updateFlashCard: suspend (FlashCard) -> Unit = {
         flashCardDao.updateCard(it)
     }
-    val getAllCards: suspend () -> List<FlashCard> = {
+    /*val getAllCards: suspend () -> List<FlashCard> = {
         flashCardDao.getAll()
-    }
+    }*/
     val getCardById: suspend (Int?) -> FlashCard? = {
         flashCardDao.getCardById(it)
     }

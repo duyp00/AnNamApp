@@ -104,6 +104,7 @@ private fun titleForRoute(route: String?): String {
         // For routes with arguments (like CardDetail), the route string will be
         // "com.example...Routes.CardDetail/{cardId}"
         // So we check if the string *starts with* the class name.
+        route?.startsWith(Routes.SearchResults::class.qualifiedName!!) == true -> "Search Results"
         route?.startsWith(Routes.CardDetail::class.qualifiedName!!) == true -> "Card Details"
 
         else -> "New screen"

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
@@ -20,8 +19,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.example.annamapp.navigation.Routes
 
@@ -32,11 +29,11 @@ fun SearchScreen(
     onMessageChange: (String) -> Unit = {}
 ) {
     var englishQuery by rememberSaveable { mutableStateOf("") }
-    var englishEnabled by rememberSaveable { mutableStateOf(false) }
+    var englishEnabled by rememberSaveable { mutableStateOf(true) }
     var englishWholeWord by rememberSaveable { mutableStateOf(false) }
 
     var vietnameseQuery by rememberSaveable { mutableStateOf("") }
-    var vietnameseEnabled by rememberSaveable { mutableStateOf(false) }
+    var vietnameseEnabled by rememberSaveable { mutableStateOf(true) }
     var vietnameseWholeWord by rememberSaveable { mutableStateOf(false) }
 
     val canSearch = (englishEnabled && englishQuery.isNotBlank()) ||
@@ -131,10 +128,11 @@ private fun SearchFieldSection(
             onValueChange = onValueChange,
             label = { Text("$label word") },
             singleLine = true,
+            /*
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
                 imeAction = ImeAction.Done
-            )
+            )*/
         )
 
         Row(
