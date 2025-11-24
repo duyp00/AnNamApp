@@ -13,7 +13,7 @@ interface FlashCardDao {
     suspend fun getAll(): List<FlashCard>
 
     @Query("SELECT * FROM FlashCards WHERE uid IN (:flashCardIds)")
-    suspend fun loadAllByIds(flashCardIds: IntArray): List<FlashCard>?
+    suspend fun loadAllByIds(flashCardIds: IntArray): List<FlashCard>
 
     /**
      * Finds a single card by its unique ID (uid), used for the detail/delete screen.
@@ -27,14 +27,14 @@ interface FlashCardDao {
 
     /**
      * Search cards with optional filters on English and Vietnamese fields.
-     * When a field is disabled the clause is ignored; otherwise AND logic is applied.
+     * When multiple fields are enabled a card matches if it satisfies any checked field.
      */
     @Query(
         "SELECT * FROM FlashCards WHERE " +
-                "(:englishEnabled = 0 OR " +
-                "(CASE WHEN :englishWholeWord = 1 THEN english_card = :englishQuery ELSE english_card LIKE '%' || :englishQuery || '%' END)) AND " +
-                "(:vietnameseEnabled = 0 OR " +
-                "(CASE WHEN :vietnameseWholeWord = 1 THEN vietnamese_card = :vietnameseQuery ELSE vietnamese_card LIKE '%' || :vietnameseQuery || '%' END))"
+                "((:englishEnabled = 1 AND " +
+                "(CASE WHEN :englishWholeWord = 1 THEN english_card = :englishQuery ELSE english_card LIKE '%' || :englishQuery || '%' END)) OR " +
+                "(:vietnameseEnabled = 1 AND " +
+                "(CASE WHEN :vietnameseWholeWord = 1 THEN vietnamese_card = :vietnameseQuery ELSE vietnamese_card LIKE '%' || :vietnameseQuery || '%' END)))"
     )
     suspend fun searchCards(
         englishQuery: String,
