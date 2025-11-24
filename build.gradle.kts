@@ -11,6 +11,6 @@ plugins {
 
 kotlin {
 
-    jvmToolchain(21) // Use your desired version
+    jvmToolchain(25) // Use your desired version
 
 }
