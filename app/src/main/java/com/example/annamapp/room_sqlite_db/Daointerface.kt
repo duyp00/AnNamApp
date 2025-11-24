@@ -21,7 +21,7 @@ interface FlashCardDao {
     @Query("SELECT * FROM FlashCards WHERE uid = :uid LIMIT 1")
     suspend fun getCardById(uid: Int?): FlashCard?
 
-    @Query("SELECT * FROM FlashCards WHERE english_card LIKE :english AND " + //+ here is concatenation, nothing to do with sql
+    @Query("SELECT * FROM FlashCards WHERE english_card LIKE :english AND " +/*'+' here is concatenation, nothing to do with sql*/
             "vietnamese_card LIKE :vietnamese LIMIT 1")
     suspend fun findByCards(english: String, vietnamese: String): FlashCard?
 
