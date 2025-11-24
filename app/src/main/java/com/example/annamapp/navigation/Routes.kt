@@ -34,6 +34,19 @@ sealed interface Routes {
     data object Search : Routes
 
     /**
+     * Search results screen carrying the user-entered filters.
+     */
+    @Serializable
+    data class SearchResults(
+        val englishQuery: String = "",
+        val englishEnabled: Boolean = false,
+        val englishWholeWord: Boolean = false,
+        val vietnameseQuery: String = "",
+        val vietnameseEnabled: Boolean = false,
+        val vietnameseWholeWord: Boolean = false
+    ) : Routes
+
+    /**
      * Card Detail screen.
      * @param cardId The unique ID of the card to display.
      * This is a 'data class' because it carries data.

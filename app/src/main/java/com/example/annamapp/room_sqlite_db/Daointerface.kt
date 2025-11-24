@@ -26,55 +26,23 @@ interface FlashCardDao {
     suspend fun findByCards(english: String, vietnamese: String): FlashCard?
 
     /**
-     * Search cards with partial match on both fields (OR logic).
-     * Returns cards where either English OR Vietnamese field matches.
-     * Empty queries are ignored.
+     * Search cards with optional filters on English and Vietnamese fields.
+     * When a field is disabled the clause is ignored; otherwise AND logic is applied.
      */
-    @Query("SELECT * FROM FlashCards WHERE " +
-            "(:englishQuery != '' AND english_card LIKE '%' || :englishQuery || '%') OR " +
-            "(:vietnameseQuery != '' AND vietnamese_card LIKE '%' || :vietnameseQuery || '%')")
-    suspend fun searchCardsPartial(
+    @Query(
+        "SELECT * FROM FlashCards WHERE " +
+                "(:englishEnabled = 0 OR " +
+                "(CASE WHEN :englishWholeWord = 1 THEN english_card = :englishQuery ELSE english_card LIKE '%' || :englishQuery || '%' END)) AND " +
+                "(:vietnameseEnabled = 0 OR " +
+                "(CASE WHEN :vietnameseWholeWord = 1 THEN vietnamese_card = :vietnameseQuery ELSE vietnamese_card LIKE '%' || :vietnameseQuery || '%' END))"
+    )
+    suspend fun searchCards(
         englishQuery: String,
-        vietnameseQuery: String
-    ): List<FlashCard>
-
-    /**
-     * Search cards with exact English, partial Vietnamese (OR logic).
-     * Returns cards where either English OR Vietnamese field matches.
-     * Empty queries are ignored.
-     */
-    @Query("SELECT * FROM FlashCards WHERE " +
-            "(:englishQuery != '' AND english_card = :englishQuery) OR " +
-            "(:vietnameseQuery != '' AND vietnamese_card LIKE '%' || :vietnameseQuery || '%')")
-    suspend fun searchCardsExactEnglish(
-        englishQuery: String,
-        vietnameseQuery: String
-    ): List<FlashCard>
-
-    /**
-     * Search cards with partial English, exact Vietnamese (OR logic).
-     * Returns cards where either English OR Vietnamese field matches.
-     * Empty queries are ignored.
-     */
-    @Query("SELECT * FROM FlashCards WHERE " +
-            "(:englishQuery != '' AND english_card LIKE '%' || :englishQuery || '%') OR " +
-            "(:vietnameseQuery != '' AND vietnamese_card = :vietnameseQuery)")
-    suspend fun searchCardsExactVietnamese(
-        englishQuery: String,
-        vietnameseQuery: String
-    ): List<FlashCard>
-
-    /**
-     * Search cards with exact match on both fields (OR logic).
-     * Returns cards where either English OR Vietnamese field matches.
-     * Empty queries are ignored.
-     */
-    @Query("SELECT * FROM FlashCards WHERE " +
-            "(:englishQuery != '' AND english_card = :englishQuery) OR " +
-            "(:vietnameseQuery != '' AND vietnamese_card = :vietnameseQuery)")
-    suspend fun searchCardsExactBoth(
-        englishQuery: String,
-        vietnameseQuery: String
+        englishEnabled: Boolean,
+        englishWholeWord: Boolean,
+        vietnameseQuery: String,
+        vietnameseEnabled: Boolean,
+        vietnameseWholeWord: Boolean
     ): List<FlashCard>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE, entity = FlashCard::class)

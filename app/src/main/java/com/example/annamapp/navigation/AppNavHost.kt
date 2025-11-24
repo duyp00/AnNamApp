@@ -14,6 +14,7 @@ import com.example.annamapp.screens.CardDetailScreen
 import com.example.annamapp.screens.HomeScreen
 import com.example.annamapp.screens.SearchScreen
 import com.example.annamapp.screens.StudyScreen
+import com.example.annamapp.screens.SearchResultScreen
 
 @Composable
 fun AppNavHost(
@@ -65,13 +66,24 @@ fun AppNavHost(
 
         composable<Routes.Search> {
             SearchScreen(
-                getAllCards = getAllCards,
-                deleteCard = deleteCard,
-                onMessageChange = onMessageChange,
-                onEditClick = { cardId ->
-                    // Navigate with arguments by passing an instance of the data class
-                    navCtrller.navigate(Routes.CardDetail(cardId = cardId))
-                }
+                onSearch = { filters -> navCtrller.navigate(filters) },
+                onShowAllCards = { navCtrller.navigate(Routes.SearchResults()) },
+                onMessageChange = onMessageChange
+            )
+        }
+
+        composable<Routes.SearchResults> { backStackEntry ->
+            val args = backStackEntry.toRoute<Routes.SearchResults>()
+            SearchResultScreen(
+                filters = args,
+                performSearch = { filters ->
+                    searchFlashCards(flashCardDao, filters)
+                },
+                deleteCards = { cards ->
+                    cards.forEach { card -> deleteCard(card) }
+                },
+                onNavigateToCard = { cardId -> navCtrller.navigate(Routes.CardDetail(cardId)) },
+                onMessageChange = onMessageChange
             )
         }
 
@@ -89,5 +101,23 @@ fun AppNavHost(
                 onMessageChange = onMessageChange
             )
         }
+    }
+}
+
+private suspend fun searchFlashCards(
+    flashCardDao: FlashCardDao,
+    filters: Routes.SearchResults
+): List<FlashCard> {
+    return if (filters.englishEnabled || filters.vietnameseEnabled) {
+        flashCardDao.searchCards(
+            englishQuery = filters.englishQuery,
+            englishEnabled = filters.englishEnabled,
+            englishWholeWord = filters.englishWholeWord,
+            vietnameseQuery = filters.vietnameseQuery,
+            vietnameseEnabled = filters.vietnameseEnabled,
+            vietnameseWholeWord = filters.vietnameseWholeWord
+        )
+    } else {
+        flashCardDao.getAll()
     }
 }
