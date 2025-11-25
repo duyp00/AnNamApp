@@ -90,10 +90,10 @@ fun SearchScreen(
                     val filters = Routes.SearchResults(
                         englishQuery = englishQuery.trim(),
                         englishEnabled = englishEnabled && englishQuery.isNotBlank(),
-                        englishWholeWord = englishWholeWord && englishEnabled,
+                        englishWholeWord = englishWholeWord /*&& englishEnabled*/,
                         vietnameseQuery = vietnameseQuery.trim(),
                         vietnameseEnabled = vietnameseEnabled && vietnameseQuery.isNotBlank(),
-                        vietnameseWholeWord = vietnameseWholeWord && vietnameseEnabled
+                        vietnameseWholeWord = vietnameseWholeWord /*&& vietnameseEnabled*/
                     )
                     onSearch(filters)
                 }
@@ -150,7 +150,7 @@ private fun SearchFieldSection(
                 text = "Whole word",
                 checked = wholeWord,
                 onCheckedChange = onWholeWordChange,
-                enabled = enabled
+                //enabled = enabled
             )
         }
     }
@@ -161,10 +161,10 @@ private fun CheckboxRow(
     text: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    enabled: Boolean = true
+    //enabled: Boolean = true
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(checked = checked, onCheckedChange = { onCheckedChange(it) }, enabled = enabled)
+        Checkbox(checked = checked, onCheckedChange = { onCheckedChange(it) }, /*enabled = enabled*/)
         Text(text)
     }
 }

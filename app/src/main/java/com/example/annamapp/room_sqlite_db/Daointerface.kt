@@ -55,6 +55,6 @@ interface FlashCardDao {
     @Delete(entity = FlashCard::class)
     suspend fun delete(flashCard: FlashCard)
 
-    @Update(entity = FlashCard::class)
+    @Update(entity = FlashCard::class, onConflict = OnConflictStrategy.IGNORE)
     suspend fun updateCard(flashCard: FlashCard)
 }

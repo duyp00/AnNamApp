@@ -54,11 +54,11 @@ fun CardDetailScreen(
 
     // Fetch card data
     LaunchedEffect(key1 = Unit) {
-        val fetchedCard = getCardById(cardId)
-        card = fetchedCard
-        if (fetchedCard != null) {
-            englishText = fetchedCard.englishCard ?: ""
-            vietnameseText = fetchedCard.vietnameseCard ?: ""
+        //val fetchedCard = getCardById(cardId)
+        card = getCardById(cardId)
+        if (card != null) {
+            englishText = card?.englishCard ?: ""
+            vietnameseText = card?.vietnameseCard ?: ""
             onMessageChange("Edit card details")
         } else {
             onMessageChange("Card not found")
