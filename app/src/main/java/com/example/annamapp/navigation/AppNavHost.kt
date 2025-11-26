@@ -20,7 +20,7 @@ import com.example.annamapp.screens.SearchResultScreen
 fun AppNavHost(
     flashCardDao: FlashCardDao,
     navCtrller: NavHostController = rememberNavController(),
-    modder: Modifier,
+    modifier: Modifier,
     // The start destination is now a type-safe object, not a String
     startDestnt: Routes, //= Routes.Home,
     onMessageChange: (String) -> Unit = {}
@@ -43,7 +43,7 @@ fun AppNavHost(
     }
 
     // The startDestination parameter now takes the Routes.Home object directly
-    NavHost(navController = navCtrller, startDestination = startDestnt, modifier = modder) {
+    NavHost(navController = navCtrller, startDestination = startDestnt, modifier = modifier) {
 
         // Use composable<T> for type-safe destinations without arguments
         composable<Routes.Home> {
@@ -79,8 +79,8 @@ fun AppNavHost(
                 performSearch = { filters ->
                     searchFlashCards(flashCardDao, filters)
                 },
-                deleteCards = { cards ->
-                    cards.forEach { card -> deleteCard(card) }
+                deleteCards = { deletelist ->
+                    deletelist.forEach { card -> deleteCard(card) }
                 },
                 onNavigateToCard = { cardId -> navCtrller.navigate(Routes.CardDetail(cardId)) },
                 onMessageChange = onMessageChange

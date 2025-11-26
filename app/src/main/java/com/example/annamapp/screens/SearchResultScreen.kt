@@ -54,9 +54,7 @@ fun SearchResultScreen(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Row(
@@ -70,10 +68,11 @@ fun SearchResultScreen(
                 onClick = {
                     scope.launch {
                         val toDelete = results.filter { selectedCardIds.contains(it.uid) }
+                        /* //this is never reached because button is disabled when no selection
                         if (toDelete.isEmpty()) {
                             onMessageChange("Select card(s) to delete")
                             return@launch
-                        }
+                        }*/
                         deleteCards(toDelete)
                         onMessageChange("Deleted ${toDelete.size} card(s)")
                         refresh()
@@ -94,9 +93,9 @@ fun SearchResultScreen(
                         isSelected = selectedCardIds.contains(card.uid),
                         onSelectionChange = { checked ->
                             selectedCardIds = if (checked) {
-                                selectedCardIds + card.uid
+                                selectedCardIds + card.uid//'+' here is adding element to set, creating new (immutable) set
                             } else {
-                                selectedCardIds - card.uid
+                                selectedCardIds - card.uid//'-' same as above but removing element
                             }
                         },
                         onViewClick = { onNavigateToCard(card.uid) }
@@ -115,18 +114,14 @@ private fun ResultRow(
     onViewClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp),
+        modifier = Modifier.fillMaxWidth().padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Checkbox(checked = isSelected, onCheckedChange = onSelectionChange)
 
         Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 12.dp)
+            modifier = Modifier.weight(1f).padding(horizontal = 12.dp)
         ) {
             Text(text = card.englishCard.orEmpty(), style = MaterialTheme.typography.bodyLarge)
             Text(text = card.vietnameseCard.orEmpty(), style = MaterialTheme.typography.bodyMedium)

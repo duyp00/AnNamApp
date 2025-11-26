@@ -84,9 +84,7 @@ fun CardStudyApp(
             onMessageChange = {message = it},
             navCtrller = navController,
             startDestnt = Routes.Home, // Pass the type-safe object here
-            modder = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
+            modifier = Modifier.padding(innerPadding).fillMaxSize()
         )
     }
 }

@@ -33,7 +33,7 @@ class AppNavigationTest {
             AppNavHost(
                 navCtrller = navController,
                 startDestnt = Routes.Home,
-                modder = Modifier,
+                modifier = Modifier,
             )
         }
 

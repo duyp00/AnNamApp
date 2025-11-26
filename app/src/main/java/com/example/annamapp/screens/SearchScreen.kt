@@ -44,9 +44,7 @@ fun SearchScreen(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Text(
@@ -82,10 +80,11 @@ fun SearchScreen(
                 modifier = Modifier.weight(1f),
                 enabled = canSearch,
                 onClick = {
+                    /* //this is never reached due to button being disabled already
                     if (!canSearch) {
                         onMessageChange("Select at least one field and enter text")
                         return@Button
-                    }
+                    }*/
 
                     val filters = Routes.SearchResults(
                         englishQuery = englishQuery.trim(),
