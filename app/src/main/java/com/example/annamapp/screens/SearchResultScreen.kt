@@ -49,8 +49,8 @@ fun SearchResultScreen(
         }
     }
 
-    LaunchedEffect(filters) {
-        refresh()
+    LaunchedEffect(Unit) {//key1 = filters would also work, but filters
+        refresh()                                  //only change when navigating to this screen
     }
 
     Column(
