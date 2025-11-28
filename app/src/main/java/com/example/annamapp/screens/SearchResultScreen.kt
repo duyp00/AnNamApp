@@ -94,7 +94,7 @@ fun SearchResultScreen(
                         onSelectionChange = { checked ->
                             selectedCardIds = if (checked) {
                                 selectedCardIds + card.uid//'+' here is adding element to set, creating new (immutable) set
-                            } else {
+                            } else {                              //then reassign to trigger recomposition
                                 selectedCardIds - card.uid//'-' same as above but removing element
                             }
                         },
