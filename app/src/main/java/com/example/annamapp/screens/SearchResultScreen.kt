@@ -71,7 +71,7 @@ fun SearchResultScreen(
                         /* //this is never reached because button is disabled when no selection
                         if (toDelete.isEmpty()) {
                             onMessageChange("Select card(s) to delete")
-                            return@launch
+                            return@launch //early abort since there is nothing to delete (read kotlin return@ for more)
                         }*/
                         deleteCards(toDelete)
                         onMessageChange("Deleted ${toDelete.size} card(s)")

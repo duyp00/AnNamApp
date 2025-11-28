@@ -83,7 +83,7 @@ fun SearchScreen(
                     /* //this is never reached due to button being disabled already
                     if (!canSearch) {
                         onMessageChange("Select at least one field and enter text")
-                        return@Button
+                        return@Button //early abort since there is nothing to search (read kotlin return@ for more)
                     }*/
 
                     val filters = Routes.SearchResults(
