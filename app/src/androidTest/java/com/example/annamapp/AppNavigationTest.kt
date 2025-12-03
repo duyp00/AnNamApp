@@ -1,45 +1,64 @@
 package com.example.annamapp
 
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.hasText
+import android.content.Context
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
+import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import com.example.annamapp.navigation.AppNavHost
 import com.example.annamapp.navigation.Routes
+import com.example.annamapp.room_sqlite_db.AnNamDatabase
+import com.example.annamapp.room_sqlite_db.FlashCardDao
+import com.example.annamapp.ui.CardStudyApp
 import junit.framework.TestCase.assertEquals
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+//@RunWith(androidx.test.ext.junit.runners.AndroidJUnit4::class)
 class AppNavigationTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+    private lateinit var db: AnNamDatabase
+    private lateinit var flashCardDao: FlashCardDao
 
+
+    @Before
+    fun setup() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        db = Room.inMemoryDatabaseBuilder(
+            context, AnNamDatabase::class.java).build()
+        flashCardDao = db.flashCardDao()
+    }
+
+    @After
+    fun close(){
+        db.close()
+    }
+
+    //@Composable
     @Test
     fun launchHomeAtStart() {
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         navController.navigatorProvider.addNavigator(ComposeNavigator())
+        //val navBackStackEntry by navController.currentBackStackEntryAsState()
 
         composeTestRule.setContent {
-            AppNavHost(
-                navCtrller = navController,
-                modifier = Modifier,
-            )
+            CardStudyApp(flashCardDao = flashCardDao, navController = navController)
         }
 
-        assertEquals("home", navController.currentDestination?.route)
+        composeTestRule.runOnIdle {
+            assertEquals(Routes.Home::class.qualifiedName, navController.currentBackStackEntry?.destination?.route)
+        }
         //should make a separate function to test Add Card screen navigation, below is just to see if it works
         composeTestRule.onNodeWithContentDescription("openAddCardScreen").performClick()
-        assertEquals("add", navController.currentDestination?.route)
+        composeTestRule.runOnIdle {
+            assertEquals(Routes.Add::class.qualifiedName, navController.currentBackStackEntry?.destination?.route)
+        }
     }
 
     /*

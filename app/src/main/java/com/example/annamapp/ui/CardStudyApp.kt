@@ -18,19 +18,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.example.annamapp.room_sqlite_db.FlashCardDao
 import com.example.annamapp.R
 import com.example.annamapp.navigation.AppNavHost
 import com.example.annamapp.navigation.Routes
+import com.example.annamapp.room_sqlite_db.FlashCardDao
 
 @OptIn(ExperimentalMaterial3Api::class) // Required for TopAppBar
 @Composable
 fun CardStudyApp(
-    flashCardDao: FlashCardDao
+    flashCardDao: FlashCardDao,
+    navController: NavHostController/* = rememberNavController()*/
 ) {
-    val navController = rememberNavController()
+    //val navController = rememberNavController()
 
     // --- FIX: Use string-based routes for Scaffold logic ---
 
