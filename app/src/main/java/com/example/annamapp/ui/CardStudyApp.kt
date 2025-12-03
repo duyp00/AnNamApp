@@ -83,7 +83,6 @@ fun CardStudyApp(
             flashCardDao = flashCardDao,
             onMessageChange = {message = it},
             navCtrller = navController,
-            startDestnt = Routes.Home, // Pass the type-safe object here
             modifier = Modifier.padding(innerPadding).fillMaxSize()
         )
     }

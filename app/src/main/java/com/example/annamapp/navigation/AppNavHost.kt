@@ -22,7 +22,6 @@ fun AppNavHost(
     navCtrller: NavHostController = rememberNavController(),
     modifier: Modifier,
     // The start destination is now a type-safe object, not a String
-    startDestnt: Routes, //= Routes.Home,
     onMessageChange: (String) -> Unit = {}
 ) {
     // Define lambdas for database operations.
@@ -43,7 +42,7 @@ fun AppNavHost(
     }
 
     // The startDestination parameter now takes the Routes.Home object directly
-    NavHost(navController = navCtrller, startDestination = startDestnt, modifier = modifier) {
+    NavHost(navController = navCtrller, startDestination = Routes.Home, modifier = modifier) {
 
         // Use composable<T> for type-safe destinations without arguments
         composable<Routes.Home> {

@@ -88,4 +88,66 @@ class DaoTest {
         }
         assertEquals(false, error)
     }
+
+    /* Delete */
+    @Test
+    fun deleteExistingFlashCard() {
+        val flashCard =
+            FlashCard(
+                uid = 0,
+                englishCard = "test_english",
+                vietnameseCard = "test_vietnamese"
+            )
+
+        var flashCardsBefore: List<FlashCard>
+        runBlocking {
+            flashCardsBefore = flashCardDao.getAll()
+        }
+        runBlocking{
+            flashCardDao.insertAll(flashCard)
+            val insertedCard = flashCardDao.findByCards("test_english", "test_vietnamese")
+            flashCardDao.delete(insertedCard!!)
+        }
+        var flashCardsAfter: List<FlashCard>
+        runBlocking {
+            flashCardsAfter = flashCardDao.getAll()
+        }
+        assertEquals(flashCardsBefore, flashCardsAfter)
+    }
+
+
+    @Test
+    fun deleteNonExistingFlashCard() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        db = Room.inMemoryDatabaseBuilder(context, AnNamDatabase::class.java).build()
+        flashCardDao = db.flashCardDao()
+
+        val flashCard =
+            FlashCard(
+                uid = 0,
+                englishCard = "test_english",
+                vietnameseCard = "test_vietnamese"
+            )
+
+        var flashCardsBefore: List<FlashCard>
+        runBlocking {
+            flashCardDao.insertAll(flashCard)
+            flashCardsBefore = flashCardDao.getAll()
+        }
+        runBlocking {
+            flashCardDao.delete(FlashCard(
+                uid = 0,
+                englishCard = "test_english_1",
+                vietnameseCard = "test_vietnamese_1"
+            )
+            )
+        }
+        var flashCardsAfter: List<FlashCard>
+        runBlocking {
+            flashCardsAfter = flashCardDao.getAll()
+        }
+        assertEquals(flashCardsBefore, flashCardsAfter)
+    }
+    /* Similar for the other 2 cases */
+
 }
