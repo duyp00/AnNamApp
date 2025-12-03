@@ -9,15 +9,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import com.example.annamapp.room_sqlite_db.FlashCard
+import androidx.sqlite.SQLiteException
 import com.example.annamapp.R
+import com.example.annamapp.room_sqlite_db.FlashCard
 import kotlinx.coroutines.launch
 
 @Composable
@@ -29,11 +30,9 @@ fun AddCardScreen(
         onMessageChange("Add your cards now")
     }
     //var clickOnAdd by remember { mutableStateOf(false) }
-    var enWord by remember { mutableStateOf("") }
-    var vnWord by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-    //var enWord by rememberSaveable { mutableStateOf("") }
-    //var vnWord by rememberSaveable { mutableStateOf("") }
+    var enWord by rememberSaveable { mutableStateOf("") }
+    var vnWord by rememberSaveable { mutableStateOf("") }
     Column {
         TextField(
             value = enWord,
@@ -58,16 +57,21 @@ fun AddCardScreen(
             Button(onClick = {
                 //clickOnAdd = true
                 scope.launch {
-                    insertFlashCard(
-                        FlashCard(
-                            uid = 0, //best value to choose is 0 since it's auto-generated
-                            englishCard = enWord,
-                            vietnameseCard = vnWord
+                    try {
+                        insertFlashCard(
+                            FlashCard(
+                                uid = 0, //best value to choose is 0 since it's auto-generated
+                                englishCard = enWord,
+                                vietnameseCard = vnWord
+                            )
                         )
-                    )
-                    onMessageChange("Added card: [$enWord, $vnWord]")
-                    enWord = ""
-                    vnWord = ""
+                        onMessageChange("Added card: [$enWord, $vnWord]")
+                    } catch (ex: SQLiteException) {
+                        onMessageChange("Card already exist. ${ex.localizedMessage}")
+                    } finally {
+                        enWord = ""
+                        vnWord = ""
+                    }
                 }
             })
             { Text("Add") }

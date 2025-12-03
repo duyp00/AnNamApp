@@ -45,7 +45,7 @@ interface FlashCardDao {
         vietnameseWholeWord: Boolean
     ): List<FlashCard>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE, entity = FlashCard::class)
+    @Insert(/*onConflict = OnConflictStrategy.IGNORE,*/ entity = FlashCard::class)
     suspend fun insertAll(vararg flashCard: FlashCard)
 
     /**
