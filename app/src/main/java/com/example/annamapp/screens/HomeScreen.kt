@@ -44,6 +44,9 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
+                .semantics {
+                    contentDescription = "navigateToStudyCards"
+                }
         ) {
             Text("Study Cards")
         }
@@ -54,7 +57,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
                 .semantics {
-                    contentDescription = "openAddCardScreen"
+                    contentDescription = "navigateToAddCard"
                 }
         ) {
             Text("Add a Card")
@@ -65,6 +68,9 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
+                .semantics {
+                    contentDescription = "navigateToSearchCards"
+                }
         ) {
             Text("Search Cards")
         }

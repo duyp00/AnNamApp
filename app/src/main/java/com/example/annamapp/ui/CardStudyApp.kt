@@ -16,8 +16,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.annamapp.R
@@ -60,14 +61,14 @@ fun CardStudyApp(
                     Text(
                         // 5. Pass the current route STRING to the title helper
                         text = titleForRoute(currentRouteString),
-                        modifier = Modifier.testTag("screen_title")
+                        modifier = Modifier.semantics{contentDescription = "screen_title"}
                     )
                 },
                 navigationIcon = if (showBack) {
                     {
                         TextButton(
                             onClick = { navController.navigateUp() },
-                            modifier = Modifier.testTag("back_button"),
+                            modifier = Modifier.semantics { contentDescription = "navigateBack" },
                             content = { Text(stringResource(R.string.back_button_label)) }
                         )
                     }

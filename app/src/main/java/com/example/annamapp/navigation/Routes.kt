@@ -13,25 +13,25 @@ sealed interface Routes {
      * We use a 'data object' for simplicity as it's a singleton.
      */
     @Serializable
-    data object Home : Routes
+    data object Home
 
     /**
      * Study screen. No arguments.
      */
     @Serializable
-    data object Study : Routes
+    data object Study
 
     /**
      * Add Card screen. No arguments.
      */
     @Serializable
-    data object Add : Routes
+    data object Add
 
     /**
      * Search/View All screen. No arguments.
      */
     @Serializable
-    data object Search : Routes
+    data object Search
 
     /**
      * Search results screen carrying the user-entered filters.
@@ -44,7 +44,7 @@ sealed interface Routes {
         val vietnameseQuery: String = "",
         val vietnameseEnabled: Boolean = false,
         val vietnameseWholeWord: Boolean = false
-    ) : Routes
+    )
 
     /**
      * Card Detail screen.
@@ -52,5 +52,5 @@ sealed interface Routes {
      * This is a 'data class' because it carries data.
      */
     @Serializable
-    data class CardDetail(val cardId: Int?) : Routes
+    data class CardDetail(val cardId: Int?)
 }
