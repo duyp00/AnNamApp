@@ -22,7 +22,6 @@ fun AppNavHost(
     flashCardDao: FlashCardDao,
     navCtrller: NavHostController = rememberNavController(),
     modifier: Modifier,
-    // The start destination is now a type-safe object, not a String
     onMessageChange: (String) -> Unit = {}
 ) {
     // Define lambdas for database operations.
@@ -41,8 +40,11 @@ fun AppNavHost(
     val deleteCard: suspend (FlashCard) -> Unit = {
         flashCardDao.delete(it)
     }
+    val findByWord: suspend (String, String) -> FlashCard? = { en, vn ->
+        flashCardDao.findByCards(english = en, vietnamese = vn)
+    }
 
-    // The startDestination parameter now takes the Routes.Home object directly
+    // The startDestination parameter now takes the Routes.Home type-safe object directly
     NavHost(navController = navCtrller, startDestination = Routes.Home, modifier = modifier) {
 
         // Use composable<T> for type-safe destinations without arguments
@@ -61,7 +63,7 @@ fun AppNavHost(
         }
 
         composable<Routes.Add> {
-            AddCardScreen(onMessageChange = onMessageChange, insertFlashCard = insertFlashCard)
+            AddCardScreen(onMessageChange = onMessageChange, insertFlashCard = insertFlashCard, findByWord = findByWord)
         }
 
         composable<Routes.Search> {

@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddCardScreen(
     insertFlashCard: suspend (FlashCard) -> Unit,
+    findByWord: suspend (String, String) -> FlashCard?,
     onMessageChange: (String) -> Unit = {}
 ) {
     LaunchedEffect(Unit) { //according to chatgpt i should use this
@@ -58,6 +59,9 @@ fun AddCardScreen(
                 //clickOnAdd = true
                 scope.launch {
                     try {
+                        if (findByWord(enWord, vnWord) != null) {
+                            throw SQLiteException("Card already exists in database.")
+                        }
                         insertFlashCard(
                             FlashCard(
                                 uid = 0, //best value to choose is 0 since it's auto-generated
@@ -66,8 +70,8 @@ fun AddCardScreen(
                             )
                         )
                         onMessageChange("Added card: [$enWord, $vnWord]")
-                    } catch (ex: SQLiteException) {
-                        onMessageChange("Card already exist. ${ex.localizedMessage}")
+                    } catch (ex: Exception) {
+                        onMessageChange("${ex.localizedMessage}")
                     } finally {
                         enWord = ""
                         vnWord = ""
