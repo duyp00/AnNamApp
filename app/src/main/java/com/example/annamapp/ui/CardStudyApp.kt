@@ -77,7 +77,9 @@ fun CardStudyApp(
         },
         bottomBar = {
             BottomAppBar {
-                Text(text = message)
+                Text(text = message, modifier = Modifier.semantics {
+                    contentDescription = "Message"
+                })
             }
         }
     ) { innerPadding ->

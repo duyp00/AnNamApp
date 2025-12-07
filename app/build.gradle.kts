@@ -1,4 +1,3 @@
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -106,28 +105,26 @@ dependencies {
     implementation(libs.androidx.room.runtime)
 
     implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.tooling.preview)
+    //implementation(libs.androidx.compose.ui.tooling.preview)
 
     testImplementation(libs.junit)
-    debugImplementation(libs.androidx.compose.ui.tooling)
+    //debugImplementation(libs.androidx.compose.ui.tooling)
 
     testImplementation(libs.robolectric)
 
     // Needed for createComposeRule(), but not for createAndroidComposeRule<YourActivity>():
 
-    //debugImplementation(libs.androidx.compose.ui.test.manifest)
-
-
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     // androidTestImplementation(libs.androidx.junit)
 
     // androidTestImplementation(libs.androidx.espresso.core)
 
-    // androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(platform(libs.androidx.compose.bom))
 
     // Test rules and transitive dependencies:
 
-    // androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 
     // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
 
@@ -146,8 +143,8 @@ dependencies {
 
     // optional - Test helpers
 
-    // testImplementation(libs.androidx.room.testing)
+    testImplementation(libs.androidx.room.testing)
 
-    // testImplementation(kotlin("test"))
+    testImplementation(kotlin("test"))
 
 }

@@ -38,12 +38,13 @@ fun AddCardScreen(
         TextField(
             value = enWord,
             onValueChange = { enWord = it },
-            modifier = Modifier.semantics { contentDescription = "English String" },
+            modifier = Modifier.semantics { contentDescription = "enTextField" },
             label = { Text(stringResource(R.string.english_label)) }
         )
         TextField(
             value = vnWord,
             onValueChange = { vnWord = it },
+            modifier = Modifier.semantics { contentDescription = "vnTextField" },
             label = { Text(stringResource(R.string.vietnamese_label)) }
         )
 
@@ -77,7 +78,7 @@ fun AddCardScreen(
                         vnWord = ""
                     }
                 }
-            })
+            }, modifier = Modifier.semantics { contentDescription = "add_card_button" })
             { Text("Add") }
         }
     }

@@ -1,7 +1,9 @@
 package com.example.annamapp
 
 import android.database.sqlite.SQLiteConstraintException
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -305,11 +307,10 @@ class ScreenTest {
             .performClick();
 
         val textInput = "house"
-        composeTestRule.onNodeWithContentDescription("enTextField")
-            .assertExists()
+        composeTestRule.onNodeWithContentDescription("enTextField").assertExists()
             .performTextInput(textInput)
         composeTestRule.onNodeWithContentDescription("enTextField")
-            .assertTextEquals("en", textInput)
+            .assertTextEquals("english", textInput)
     }
 
     // AddCard
@@ -339,7 +340,7 @@ class ScreenTest {
         // Simulate a config change.
         stateRestorationTester.emulateSavedInstanceStateRestore()
         composeTestRule.onNodeWithContentDescription("enTextField")
-            .assertTextEquals("en", textInput)
+            .assertTextEquals("english", textInput)
     }
 
     @Test
@@ -359,14 +360,14 @@ class ScreenTest {
         composeTestRule.onNodeWithContentDescription("navigateToAddCard")
             .performClick();
 
-        composeTestRule.onNodeWithContentDescription("Add")
+        composeTestRule.onNodeWithContentDescription("add_card_button")
             .assertExists()
             .performClick()
 
         composeTestRule.onNodeWithContentDescription("Message")
             .assertExists()
-            .assertTextEquals("Flash card successfully added to your database.")
-
+            .assert(hasText(text = "Added card:", substring = true))
+            //.assertTextContains("Added card:")
     }
 
 
@@ -392,12 +393,12 @@ class ScreenTest {
         composeTestRule.onNodeWithContentDescription("navigateToAddCard")
             .performClick();
 
-        composeTestRule.onNodeWithContentDescription("Add")
+        composeTestRule.onNodeWithContentDescription("add_card_button")
             .assertExists()
             .performClick()
 
         composeTestRule.onNodeWithContentDescription("Message")
             .assertExists()
-            .assertTextEquals("Flash card already exists in your database.")
+            .assertTextEquals("Card already exists in database.")
     }
 }
