@@ -21,6 +21,7 @@ fun HomeScreen(
     onNavigateToStudy: () -> Unit,
     onNavigateToAdd: () -> Unit,
     onNavigateToSearch: () -> Unit,
+    onNavigateToLogIn: () -> Unit,
     onMessageChange: (String) -> Unit = {}
 ) {
     LaunchedEffect(Unit) {
@@ -73,6 +74,18 @@ fun HomeScreen(
                 }
         ) {
             Text("Search Cards")
+        }
+
+        Button(
+            onClick = onNavigateToLogIn,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .semantics {
+                    contentDescription = "navigateToLogIn"
+                }
+        ) {
+            Text("Log in")
         }
     }
 }

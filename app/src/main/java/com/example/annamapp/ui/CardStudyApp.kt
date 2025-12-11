@@ -30,7 +30,8 @@ import com.example.annamapp.room_sqlite_db.FlashCardDao
 @Composable
 fun CardStudyApp(
     flashCardDao: FlashCardDao,
-    navController: NavHostController/* = rememberNavController()*/
+    navController: NavHostController,/* = rememberNavController()*/
+    networkService: NetworkService
 ) {
     //val navController = rememberNavController()
 
@@ -87,7 +88,8 @@ fun CardStudyApp(
             flashCardDao = flashCardDao,
             onMessageChange = {message = it},
             navCtrller = navController,
-            modifier = Modifier.padding(innerPadding).fillMaxSize()
+            modifier = Modifier.padding(innerPadding).fillMaxSize(),
+            networkService = networkService
         )
     }
 }
@@ -101,6 +103,7 @@ private fun titleForRoute(route: String?): String {
         route == Routes.Study::class.qualifiedName -> "Study Cards"
         route == Routes.Add::class.qualifiedName -> "Add a Card"
         route == Routes.Search::class.qualifiedName -> "Search Cards"
+        route == Routes.LogIn::class.qualifiedName -> "Log In"
 
         // For routes with arguments (like CardDetail), the route string will be
         // "com.example...Routes.CardDetail/{cardId}"

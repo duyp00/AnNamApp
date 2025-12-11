@@ -12,9 +12,11 @@ import com.example.annamapp.room_sqlite_db.FlashCardDao
 import com.example.annamapp.screens.AddCardScreen
 import com.example.annamapp.screens.CardDetailScreen
 import com.example.annamapp.screens.HomeScreen
+import com.example.annamapp.screens.LogInScreen
 import com.example.annamapp.screens.SearchScreen
 import com.example.annamapp.screens.StudyScreen
 import com.example.annamapp.screens.SearchResultScreen
+import com.example.annamapp.ui.NetworkService
 //import com.example.annamapp.navigation.Routes.*
 
 @Composable
@@ -22,7 +24,8 @@ fun AppNavHost(
     flashCardDao: FlashCardDao,
     navCtrller: NavHostController = rememberNavController(),
     modifier: Modifier,
-    onMessageChange: (String) -> Unit = {}
+    onMessageChange: (String) -> Unit = {},
+    networkService: NetworkService
 ) {
     // Define lambdas for database operations.
     val insertFlashCard: suspend (FlashCard) -> Unit = {
@@ -54,6 +57,7 @@ fun AppNavHost(
                 onNavigateToStudy = { navCtrller.navigate(Routes.Study) },
                 onNavigateToAdd = { navCtrller.navigate(Routes.Add) },
                 onNavigateToSearch = { navCtrller.navigate(Routes.Search) },
+                onNavigateToLogIn = { navCtrller.navigate(Routes.LogIn) },
                 onMessageChange = onMessageChange
             )
         }
@@ -72,6 +76,10 @@ fun AppNavHost(
                 onShowAllCards = { navCtrller.navigate(Routes.SearchResults()) },
                 onMessageChange = onMessageChange
             )
+        }
+
+        composable<Routes.LogIn> {
+            LogInScreen(onMessageChange = onMessageChange, networkService = networkService)
         }
 
         composable<Routes.SearchResults> { backStackEntry ->

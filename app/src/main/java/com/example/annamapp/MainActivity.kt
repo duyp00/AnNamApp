@@ -7,6 +7,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.example.annamapp.room_sqlite_db.AnNamDatabase
 import com.example.annamapp.ui.CardStudyApp
+import com.example.annamapp.ui.NetworkService
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,9 +29,16 @@ class MainActivity : ComponentActivity() {
             Log.d("AnNam", users.toString())
         }*/
 
+        val retrofit: Retrofit = Retrofit.Builder()
+            .baseUrl("https://placeholder.com")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val networkService = retrofit.create(NetworkService::class.java)
+
         setContent {
             val navController = rememberNavController()
-            CardStudyApp(flashCardDao = flashCardDao, navController = navController)
+            CardStudyApp(flashCardDao = flashCardDao, navController = navController, networkService = networkService)
         }
     }
 }

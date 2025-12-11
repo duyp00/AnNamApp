@@ -33,6 +33,9 @@ sealed interface Routes {
     @Serializable
     data object Search
 
+    @Serializable
+    data object LogIn
+
     /**
      * Search results screen carrying the user-entered filters.
      */
