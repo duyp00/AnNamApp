@@ -57,4 +57,7 @@ interface FlashCardDao {
 
     @Update(entity = FlashCard::class, onConflict = OnConflictStrategy.IGNORE)
     suspend fun updateCard(flashCard: FlashCard)
+
+    @Query("SELECT * FROM FlashCards ORDER BY RANDOM() LIMIT :size")
+    suspend fun getLesson(size: Int): List<FlashCard>
 }

@@ -51,7 +51,7 @@ fun AnNamAppTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        //typography = Typography,
         content = content
     )
 }

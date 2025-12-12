@@ -8,6 +8,7 @@ import androidx.room.Room
 import com.example.annamapp.room_sqlite_db.AnNamDatabase
 import com.example.annamapp.ui.CardStudyApp
 import com.example.annamapp.ui.NetworkService
+import com.example.annamapp.ui.theme.AnNamAppTheme
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -38,7 +39,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
-            CardStudyApp(flashCardDao = flashCardDao, navController = navController, networkService = networkService)
+            AnNamAppTheme {
+                CardStudyApp(flashCardDao = flashCardDao, navController = navController, networkService = networkService)
+            }
         }
     }
 }

@@ -46,6 +46,9 @@ fun AppNavHost(
     val findByWord: suspend (String, String) -> FlashCard? = { en, vn ->
         flashCardDao.findByCards(english = en, vietnamese = vn)
     }
+    val pickCardLesson: suspend (Int) -> List<FlashCard> = {
+        flashCardDao.getLesson(it)
+    }
 
     // The startDestination parameter now takes the Routes.Home type-safe object directly
     NavHost(navController = navCtrller, startDestination = Routes.Home, modifier = modifier) {
@@ -63,7 +66,7 @@ fun AppNavHost(
         }
 
         composable<Routes.Study> {
-            StudyScreen(onMessageChange = onMessageChange)
+            StudyScreen(onMessageChange = onMessageChange, pickCardLesson = pickCardLesson)
         }
 
         composable<Routes.Add> {
