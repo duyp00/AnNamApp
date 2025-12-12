@@ -35,7 +35,6 @@ fun StudyScreen(
     var currentIndex by rememberSaveable { mutableStateOf(0) }
     var isVietnameseVisible by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val title = if (isVietnameseVisible) "Vietnamese" else "English"
 
     suspend fun loadCards() {
         cardList = pickCardLesson(numberOfCardsToStudy)
@@ -53,27 +52,24 @@ fun StudyScreen(
         loadCards()
     }
 
-    //cannot place these two lines here because cardList are being fetched asynchronously, a check for actualNumberofCardsFetched is needed
-    //val currentCard = cardList[currentIndex]
-    //val displayText = (if (isVietnameseVisible) currentCard.vietnameseCard else currentCard.englishCard) ?: ""
-
     Column(
         //verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()/*.padding(24.dp)*/,
     ) {
-        //this check is very important since cardList is being fetched asynchronously, or outOfBounds exception will be thrown
+        //this check is very important since cardList is being fetched asynchronously, or outOfBounds exception with cardList will be thrown
         if (actualNumberofCardsFetched == 0) {
             Text(
                 text = "No cards to display",
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
-            return@Column
+            return@Column //see return@myLabel in Kotlin
         }
 
         val currentCard = cardList[currentIndex]
         val displayText = (if (isVietnameseVisible) currentCard.vietnameseCard else currentCard.englishCard) ?: ""
+        val title = if (isVietnameseVisible) "Vietnamese" else "English"
 
         Text(
             text = title,

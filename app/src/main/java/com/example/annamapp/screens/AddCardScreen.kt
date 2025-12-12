@@ -52,8 +52,7 @@ fun AddCardScreen(
         if (clickOnAdd) {
             Text("The card is [$enWord, $vnWord] ...")
         }
-        else { {} }
-        */
+        else { {} }*/
 
         Row {
             Button(onClick = {
@@ -72,7 +71,7 @@ fun AddCardScreen(
                         )
                         onMessageChange("Added card: [$enWord, $vnWord]")
                     } catch (ex: Exception) {
-                        onMessageChange("${ex.localizedMessage}")
+                        onMessageChange("$ex") //equivalent to ex.toString() (no double quotes). if more friendly: ex.localizedMessage
                     } finally {
                         enWord = ""
                         vnWord = ""

@@ -38,8 +38,8 @@ class MainActivity : ComponentActivity() {
         val networkService = retrofit.create(NetworkService::class.java)
 
         setContent {
-            val navController = rememberNavController()
             AnNamAppTheme {
+                val navController = rememberNavController()
                 CardStudyApp(flashCardDao = flashCardDao, navController = navController, networkService = networkService)
             }
         }
