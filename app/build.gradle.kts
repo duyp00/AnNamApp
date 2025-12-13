@@ -139,13 +139,13 @@ dependencies {
     implementation(libs.androidx.room.ktx)
 
     implementation(libs.androidx.navigation.compose) // Ensure you have a recent version
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation(libs.kotlinx.serialization.json)
 
     // optional - Test helpers
 
     testImplementation(libs.androidx.room.testing)
 
     testImplementation(kotlin("test"))
-    implementation("com.squareup.retrofit2:retrofit:3.0.0")
-    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    implementation(libs.retrofit)
+    implementation(libs.retrofit2.converter.gson)
 }
