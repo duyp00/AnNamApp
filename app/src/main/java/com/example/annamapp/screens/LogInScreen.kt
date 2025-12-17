@@ -24,24 +24,26 @@ import kotlinx.coroutines.withContext
 @Composable
 fun LogInScreen(
     onMessageChange: (String) -> Unit = {},
-    networkService: NetworkService
+    networkService: NetworkService,
+    onNavigateToTokenScreen: (String) -> Unit
 ) {
     LaunchedEffect(Unit) {
         onMessageChange("get tokens to log in")
     }
 
     val scope = rememberCoroutineScope()
-    var token by rememberSaveable { mutableStateOf("") }
+    //var token by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
 
     Column {
+        /*
         TextField(
             value = token,
             onValueChange = {/* only supposed to show data from network response */},
             modifier = Modifier.semantics { contentDescription = "tokenfield" },
             label = { Text("token") },
             readOnly = true
-        )
+        )*/
         TextField(
             value = email,
             onValueChange = { email = it },
@@ -51,20 +53,24 @@ fun LogInScreen(
 
         Button(onClick = {
             scope.launch {
+                var isSuccessful = false
                 withContext(Dispatchers.IO) {
                     try {
-                        val result = networkService.generateToken(
-                            email = UserCredential(email)
-                        )
-                        token = result.token
-                        onMessageChange("The token has been received successfully.")
+                        val result = networkService.generateToken(email = UserCredential(email))
+                        //token = result.token
                         Log.d("FLASHCARD", result.toString())
-
+                        if (result.code == 200) { isSuccessful = true }
+                        else {
+                            onMessageChange(result.message)
+                            return@withContext
+                        }
                     } catch (e: Exception) {
-                        onMessageChange("There was an error in the token request.")
+                        onMessageChange("Error in the token request: $e")
                         Log.d("FLASHCARD", "Unexpected exception: $e")
                     }
                 }
+                if (isSuccessful) { onNavigateToTokenScreen(email) }
+                //else { return@launch } //can be omitted because nothing follows
             }
         },
             modifier = Modifier.semantics { contentDescription = "Enter" }

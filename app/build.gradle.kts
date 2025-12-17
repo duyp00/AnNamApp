@@ -152,7 +152,7 @@ dependencies {
 
     // datastore
     // Preferences DataStore (SharedPreferences like APIs)
-    implementation("androidx.datastore:datastore-preferences:1.2.0")
+    implementation(libs.datastore.preferences)
     // Alternatively - without an Android dependency.
-    implementation("androidx.datastore:datastore-preferences-core:1.2.0")
+    implementation(libs.androidx.datastore.preferences.core)
 }

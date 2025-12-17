@@ -31,7 +31,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun TokenScreen(
     email: String,
-    changeMessage: (String) -> Unit,
+    onMessageChange: (String) -> Unit,
     navigateToHome: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -40,7 +40,7 @@ fun TokenScreen(
     var token by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        changeMessage("Please, introduce your token.")
+        onMessageChange("Please, introduce your token.")
     }
 
 

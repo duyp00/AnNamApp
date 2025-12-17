@@ -5,7 +5,9 @@ agp = "8.13.2"
 composeVersion = "1.10.0"
 
 converterGson = "3.0.0"
-kotlin = "2.2.21"
+datastorePreferences = "1.2.0"
+datastorePreferencesCore = "1.2.0"
+kotlin = "2.3.0"
 
 coreKtx = "1.17.0"
 
@@ -52,6 +54,7 @@ androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-mani
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 
+androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastorePreferencesCore" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
 
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
@@ -60,6 +63,7 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "roomVersion" }
 
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 #androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

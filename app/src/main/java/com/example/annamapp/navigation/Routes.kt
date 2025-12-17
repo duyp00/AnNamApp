@@ -56,4 +56,7 @@ sealed interface Routes {
      */
     @Serializable
     data class CardDetail(val cardId: Int?)
+
+    @Serializable
+    data class TokenScreen(val email: String)
 }

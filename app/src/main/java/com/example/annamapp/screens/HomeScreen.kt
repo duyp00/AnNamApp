@@ -37,7 +37,25 @@ fun HomeScreen(
     val context = LocalContext.current
     val appContext = context.applicationContext
     LaunchedEffect(Unit) {
-        //onMessageChange("this is home screen")
+        //Then, use the DataStore.data property to expose the appropriate stored value using a Flow.
+
+        //In coroutines, a flow is a type that can emit multiple values sequentially,
+        //as opposed to suspend functions that return only a single value.
+        //For example, you can use a flow to receive live updates from a database.
+
+        //Flows are built on top of coroutines and can provide multiple values.
+        //A flow is conceptually a stream of data that can be computed asynchronously.
+        //The emitted values must be of the same type. For example, a Flow<Int>
+        //is a flow that emits integer values.
+
+        //In Kotlin with Jetpack DataStore, the Flow<Preferences> returned by dataStore.data
+        // emits every time any single preference within the DataStore file changes.
+        //The flow emits the entire Preferences object, containing all current key-value pairs, with each change.
+
+        //In Kotlin Flow, the first() terminal operator is used to collect only the initial value emitted
+        //by a flow and then automatically cancel the flow's execution.
+        //This is particularly useful in Jetpack Compose and other Android development scenarios
+        //where you only need a single, immediate result from a potentially long-running data stream.
         val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
         val preferences = preferencesFlow.first()
         onMessageChange(preferences[EMAIL] ?: "")

@@ -16,6 +16,7 @@ import com.example.annamapp.screens.LogInScreen
 import com.example.annamapp.screens.SearchScreen
 import com.example.annamapp.screens.StudyScreen
 import com.example.annamapp.screens.SearchResultScreen
+import com.example.annamapp.screens.TokenScreen
 import com.example.annamapp.ui.NetworkService
 //import com.example.annamapp.navigation.Routes.*
 
@@ -82,7 +83,8 @@ fun AppNavHost(
         }
 
         composable<Routes.LogIn> {
-            LogInScreen(onMessageChange = onMessageChange, networkService = networkService)
+            LogInScreen(onMessageChange = onMessageChange, networkService = networkService,
+                onNavigateToTokenScreen = {email -> navCtrller.navigate(Routes.TokenScreen(email))} )
         }
 
         composable<Routes.SearchResults> { backStackEntry ->
@@ -113,6 +115,12 @@ fun AppNavHost(
                 //onNavigateBack = { navCtrller.popBackStack() },
                 onMessageChange = onMessageChange
             )
+        }
+
+        composable<Routes.TokenScreen> { backStackEntry ->
+            val args = backStackEntry.toRoute<Routes.TokenScreen>()
+            TokenScreen(email = args.email, onMessageChange = onMessageChange,
+                navigateToHome = {navCtrller.navigate(Routes.Home)})
         }
     }
 }
