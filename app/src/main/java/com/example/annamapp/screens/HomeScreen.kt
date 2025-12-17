@@ -12,9 +12,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import com.example.annamapp.EMAIL
+import com.example.annamapp.TOKEN
+import com.example.annamapp.dataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -24,8 +33,14 @@ fun HomeScreen(
     onNavigateToLogIn: () -> Unit,
     onMessageChange: (String) -> Unit = {}
 ) {
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val context = LocalContext.current
+    val appContext = context.applicationContext
     LaunchedEffect(Unit) {
-        onMessageChange("this is home screen")
+        //onMessageChange("this is home screen")
+        val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
+        val preferences = preferencesFlow.first()
+        onMessageChange(preferences[EMAIL] ?: "")
     }
     Column(
         modifier = Modifier
@@ -86,6 +101,25 @@ fun HomeScreen(
                 }
         ) {
             Text("Log in")
+        }
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .semantics { contentDescription = "ExecuteLogout" }, onClick = {
+
+                scope.launch {
+                    appContext.dataStore.edit { preferences ->
+                        preferences.remove(EMAIL)
+                        preferences.remove(TOKEN)
+                        onMessageChange(preferences[EMAIL] ?: "")
+                    }
+                }
+
+            }) {
+            Text(
+                "Log out",
+                modifier = Modifier.semantics { contentDescription = "Logout" }
+            )
         }
     }
 }

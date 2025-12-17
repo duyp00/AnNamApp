@@ -36,6 +36,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            //signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -148,4 +149,10 @@ dependencies {
     testImplementation(kotlin("test"))
     implementation(libs.retrofit)
     implementation(libs.retrofit2.converter.gson)
+
+    // datastore
+    // Preferences DataStore (SharedPreferences like APIs)
+    implementation("androidx.datastore:datastore-preferences:1.2.0")
+    // Alternatively - without an Android dependency.
+    implementation("androidx.datastore:datastore-preferences-core:1.2.0")
 }
