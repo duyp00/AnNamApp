@@ -59,11 +59,9 @@ fun LogInScreen(
                         val result = networkService.generateToken(email = UserCredential(email))
                         //token = result.token
                         Log.d("FLASHCARD", result.toString())
+                        onMessageChange(result.message)
                         if (result.code == 200) { isSuccessful = true }
-                        else {
-                            onMessageChange(result.message)
-                            return@withContext
-                        }
+                        else { return@withContext }
                     } catch (e: Exception) {
                         onMessageChange("Error in the token request: $e")
                         Log.d("FLASHCARD", "Unexpected exception: $e")

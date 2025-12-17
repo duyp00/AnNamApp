@@ -12,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,10 +37,10 @@ fun TokenScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val appContext = context.applicationContext
-    var token by remember { mutableStateOf("") }
+    var token by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        onMessageChange("Please, introduce your token.")
+        //onMessageChange("Please, introduce your token.")
     }
 
 

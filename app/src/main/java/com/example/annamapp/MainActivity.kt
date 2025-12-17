@@ -37,22 +37,17 @@ class MainActivity : ComponentActivity() {
         val db = Room.databaseBuilder(applicationContext, AnNamDatabase::class.java, "annamapp_flashcard_db").build()
         val flashCardDao = db.flashCardDao()
 
-        /*
-        lifecycleScope.launch {
-            flashCardDao.insertAll(FlashCard(
-                uid = 0,
-                englishCard = "test13",
-                vietnameseCard = "test14"
-            ))
-            val users: List<FlashCard> = flashCardDao.getAll()
-            Log.d("AnNam", users.toString())
-        }*/
-
+        // Retrofit requires a valid HttpUrl: The baseUrl() method of Retrofit.Builder expects an okhttp3.HttpUrl object.
+        // This object represents a well-formed URL and requires a scheme (like "http" or "https"),
+        // a host, and optionally a port and path. It cannot be null or an empty string.
+        // You can use a placeholder or dummy URL, such as http://localhost/ or http://example.com/,
+        // during the initial setup. This satisfies Retrofit's requirement for a valid base URL.
         val retrofit: Retrofit = Retrofit.Builder()
             .baseUrl("https://placeholder.com")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
+        // Create an implementation of the API endpoints defined by the service interface.
         val networkService = retrofit.create(NetworkService::class.java)
 
         setContent {

@@ -44,7 +44,7 @@ fun StudyScreen(
         if (actualNumberofCardsFetched == 0) {
             onMessageChange("No cards available for study.")
         } else {
-            onMessageChange("Loaded $actualNumberofCardsFetched cards for study.")
+            onMessageChange("Loaded $actualNumberofCardsFetched cards. Tap the text to study.")
         }
     }
 
