@@ -10,4 +10,7 @@ data class UserCredential (val email: String)
 //data class UserToken (val token: String)
 
 @Serializable
-data class SimpleToken(val code: Integer, val message: String)
+data class AudioRequestJSON(val word : String, val email: String, val token: String)
+
+@Serializable
+data class ResponseJSON(val code: Int, val message: String)

@@ -2,6 +2,7 @@ package com.example.annamapp.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -21,13 +22,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
+import androidx.datastore.preferences.core.Preferences
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
+import com.example.annamapp.EMAIL
+import com.example.annamapp.TOKEN
+import com.example.annamapp.dataStore
 import com.example.annamapp.room_sqlite_db.FlashCard
+import com.example.annamapp.ui.AudioRequestJSON
+import com.example.annamapp.ui.NetworkService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import kotlin.io.encoding.Base64
 
 @Composable
 fun StudyScreen(
     onMessageChange: (String) -> Unit = {},
-    pickCardLesson: suspend (Int) -> List<FlashCard>
+    pickCardLesson: suspend (Int) -> List<FlashCard>,
+    networkService: NetworkService
 ) {
     val numberOfCardsToStudy = 3
     var cardList by remember { mutableStateOf<List<FlashCard>>(emptyList()) }
@@ -35,6 +54,10 @@ fun StudyScreen(
     var currentIndex by rememberSaveable { mutableStateOf(0) }
     var isVietnameseVisible by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val appContext = context.applicationContext
+    val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
+    var preferences by remember { mutableStateOf<Preferences?>(null) }
 
     suspend fun loadCards() {
         cardList = pickCardLesson(numberOfCardsToStudy)
@@ -49,6 +72,8 @@ fun StudyScreen(
     }
 
     LaunchedEffect(Unit) {
+        //val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
+        preferences = preferencesFlow.first()
         loadCards()
     }
 
@@ -87,15 +112,104 @@ fun StudyScreen(
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(24.dp))
-        if (isVietnameseVisible) {
-            Button(onClick = {
-                scope.launch {
-                    currentIndex = (currentIndex + 1) % actualNumberofCardsFetched
-                    isVietnameseVisible = false
+        Row(
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(8.dp)
+        ) {
+            if (isVietnameseVisible) {
+                Button(onClick = {
+                    scope.launch {
+                        currentIndex = (currentIndex + 1) % actualNumberofCardsFetched
+                        isVietnameseVisible = false
+                    }
+                }) {
+                    Text("Next")
                 }
-            }) {
-                Text("Next")
+            }
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        try {
+                            val mediaItem = withContext(Dispatchers.IO) {
+                                val filename = sha256ofString(displayText)
+                                val file = File(context.filesDir, filename)
+                                if (!file.exists()) {
+                                    val response = networkService.fetchAudio(
+                                        cardWithCredential = AudioRequestJSON(
+                                            word = displayText,
+                                            email = preferences?.get(EMAIL) ?: "",
+                                            token = preferences?.get(TOKEN) ?: ""
+                                        )
+                                    )
+                                    if (response.code != 200) {
+                                        onMessageChange("response code is not 200")
+                                        return@withContext null
+                                    }
+                                    val bytes = Base64.decode(response.message)
+                                    saveAudioToInternalStorage(file, bytes)
+                                }
+                                val mediaitem = MediaItem.fromUri(file.absolutePath.toUri())
+                                mediaitem
+                            } ?: return@launch
+
+                            val player = ExoPlayer.Builder(context).build()
+                            player.addListener(object : Player.Listener {
+                                override fun onPlaybackStateChanged(playbackState: Int) {
+                                    when (playbackState) {
+                                        Player.STATE_BUFFERING -> {
+                                            // Player is buffering, show a loading indicator if desired
+                                            onMessageChange("Buffering...")
+                                        }
+
+                                        Player.STATE_READY -> {
+                                            // Player is prepared and ready to play
+                                            onMessageChange("Ready")
+                                        }
+
+                                        Player.STATE_ENDED -> {
+                                            // Playback has finished
+                                            player.release()
+                                            onMessageChange("Finished")
+                                        }
+
+                                        Player.STATE_IDLE -> {
+                                            // Player is idle, e.g., after release or error
+                                        }
+                                    }
+                                }
+                            })
+                            player.setMediaItem(mediaItem)
+                            player.prepare()
+                            player.play()
+                        } catch (e: Exception) {
+                            onMessageChange("$e")
+                        }
+                    }
+                },
+            ) {
+                Text("Play sound")
             }
         }
     }
+}
+
+
+fun saveAudioToInternalStorage(file: File, audioData: ByteArray) {
+    FileOutputStream(file).use { fos ->
+        fos.write(audioData)
+    }
+}
+
+fun sha256ofString(filename: String): String {
+    val bytes = filename.toByteArray()
+    val message_digest = java.security.MessageDigest.getInstance("SHA-256")
+    val digestBytes = message_digest.digest(bytes)
+    val hexString = StringBuilder()
+    for (b in digestBytes) {
+        val hex = Integer.toHexString(0xff and b.toInt())
+        if (hex.length == 1) hexString.append('0')
+        hexString.append(hex)
+    }
+    return hexString.toString()
 }

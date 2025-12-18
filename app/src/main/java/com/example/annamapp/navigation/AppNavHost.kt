@@ -67,7 +67,7 @@ fun AppNavHost(
         }
 
         composable<Routes.Study> {
-            StudyScreen(onMessageChange = onMessageChange, pickCardLesson = pickCardLesson)
+            StudyScreen(onMessageChange = onMessageChange, pickCardLesson = pickCardLesson, networkService = networkService)
         }
 
         composable<Routes.Add> {

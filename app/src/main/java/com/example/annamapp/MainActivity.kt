@@ -12,8 +12,10 @@ import com.example.annamapp.room_sqlite_db.AnNamDatabase
 import com.example.annamapp.ui.CardStudyApp
 import com.example.annamapp.ui.NetworkService
 import com.example.annamapp.ui.theme.AnNamAppTheme
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 //The Preferences DataStore implementation uses the DataStore and Preferences classes to persist key-value pairs to disk.
 //Use the property delegate created by preferencesDataStore to create an instance of DataStore<Preferences>.
@@ -42,8 +44,16 @@ class MainActivity : ComponentActivity() {
         // a host, and optionally a port and path. It cannot be null or an empty string.
         // You can use a placeholder or dummy URL, such as http://localhost/ or http://example.com/,
         // during the initial setup. This satisfies Retrofit's requirement for a valid base URL.
+
+        // Create a single OkHttpClient instance
+        val sharedOkHttpClient = OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS) // Set connection timeout
+            .readTimeout(30, TimeUnit.SECONDS)    // Set read timeout
+            .build()
+        
         val retrofit: Retrofit = Retrofit.Builder()
             .baseUrl("https://placeholder.com")
+            .client(sharedOkHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

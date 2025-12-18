@@ -43,7 +43,7 @@ ui = "1.10.0"
 #uiToolingPreview = "1.10.0"
 #uiTooling = "1.10.0"
 
-
+media3Exoplayer = "1.9.0"
 
 
 [libraries]
@@ -95,7 +95,7 @@ androidx-compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref 
 #androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "uiToolingPreview" }
 #androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
 
-
+androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3Exoplayer" }
 
 [plugins]
 

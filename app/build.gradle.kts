@@ -132,9 +132,6 @@ dependencies {
     // See Add the KSP plugin to your project
 
     ksp(libs.androidx.room.compiler)
-
-
-
     // optional - Kotlin Extensions and Coroutines support for Room
 
     implementation(libs.androidx.room.ktx)
@@ -146,7 +143,7 @@ dependencies {
 
     testImplementation(libs.androidx.room.testing)
 
-    testImplementation(kotlin("test"))
+    //testImplementation(kotlin("test"))
     implementation(libs.retrofit)
     implementation(libs.retrofit2.converter.gson)
 
@@ -155,4 +152,5 @@ dependencies {
     implementation(libs.datastore.preferences)
     // Alternatively - without an Android dependency.
     implementation(libs.androidx.datastore.preferences.core)
+    implementation(libs.androidx.media3.exoplayer)
 }
