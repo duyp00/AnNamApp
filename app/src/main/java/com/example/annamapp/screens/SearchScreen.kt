@@ -111,7 +111,7 @@ fun SearchScreen(
 }
 
 @Composable
-private fun SearchFieldSection(
+fun SearchFieldSection(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
@@ -156,7 +156,7 @@ private fun SearchFieldSection(
 }
 
 @Composable
-private fun CheckboxRow(
+fun CheckboxRow(
     text: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,

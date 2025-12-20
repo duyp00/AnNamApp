@@ -96,7 +96,7 @@ fun CardStudyApp(
 
 // --- FIX: Update helper function to work with route strings ---
 @Composable
-private fun titleForRoute(route: String?): String {
+fun titleForRoute(route: String?): String {
     // Compare the route string against the qualified name of each route class
     return when {
         route == Routes.Home::class.qualifiedName -> "Home"

@@ -8,37 +8,21 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 sealed interface Routes {
-    /**
-     * Home screen. No arguments.
-     * We use a 'data object' for simplicity as it's a singleton.
-     */
     @Serializable
     data object Home
 
-    /**
-     * Study screen. No arguments.
-     */
     @Serializable
     data object Study
 
-    /**
-     * Add Card screen. No arguments.
-     */
     @Serializable
     data object Add
 
-    /**
-     * Search/View All screen. No arguments.
-     */
     @Serializable
     data object Search
 
     @Serializable
     data object LogIn
 
-    /**
-     * Search results screen carrying the user-entered filters.
-     */
     @Serializable
     data class SearchResults(
         val englishQuery: String = "",

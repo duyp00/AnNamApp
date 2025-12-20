@@ -125,7 +125,7 @@ fun AppNavHost(
     }
 }
 
-private suspend fun searchFlashCards(
+suspend fun searchFlashCards(
     flashCardDao: FlashCardDao,
     filters: Routes.SearchResults
 ): List<FlashCard> {

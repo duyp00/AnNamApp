@@ -115,16 +115,16 @@ private fun ResultRow(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        //verticalAlignment = Alignment.CenterVertically,
+        //horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Checkbox(checked = isSelected, onCheckedChange = onSelectionChange)
 
         Column(
-            modifier = Modifier.weight(1f).padding(horizontal = 12.dp)
+            modifier = Modifier.weight(1f)//.padding(horizontal = 12.dp)
         ) {
-            Text(text = card.englishCard.orEmpty(), style = MaterialTheme.typography.bodyLarge)
-            Text(text = card.vietnameseCard.orEmpty(), style = MaterialTheme.typography.bodyMedium)
+            Text(text = card.englishCard.orEmpty(), /*style = MaterialTheme.typography.bodyMedium*/)
+            Text(text = card.vietnameseCard.orEmpty(), /*style = MaterialTheme.typography.bodyMedium*/)
         }
 
         Button(onClick = onViewClick) {

@@ -15,9 +15,6 @@ interface FlashCardDao {
     @Query("SELECT * FROM FlashCards WHERE uid IN (:flashCardIds)")
     suspend fun loadAllByIds(flashCardIds: IntArray): List<FlashCard>
 
-    /**
-     * Finds a single card by its unique ID (uid), used for the detail/delete screen.
-     */
     @Query("SELECT * FROM FlashCards WHERE uid = :uid LIMIT 1")
     suspend fun getCardById(uid: Int?): FlashCard?
 
@@ -25,10 +22,6 @@ interface FlashCardDao {
             "vietnamese_card LIKE :vietnamese LIMIT 1")
     suspend fun findByCards(english: String, vietnamese: String): FlashCard?
 
-    /**
-     * Search cards with optional filters on English and Vietnamese fields.
-     * When multiple fields are enabled a card matches if it satisfies any checked field.
-     */
     @Query(
         "SELECT * FROM FlashCards WHERE " +
                 "((:englishEnabled = 1 AND " +

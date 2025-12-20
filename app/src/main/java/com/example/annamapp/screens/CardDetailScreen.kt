@@ -23,16 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.example.annamapp.room_sqlite_db.FlashCard
 import kotlinx.coroutines.launch
 
-/**
- * This is the new screen to show card details, allow editing, and deletion.
- *
- * @param getCardById A suspend function to get a single card by its ID.
- * @param updateCard A suspend function to update the card.
- * @param deleteCard A suspend function to delete a card.
- * @param cardId The unique ID of the card to display.
- * @param onNavigateBack A lambda function to navigate back.
- * @param onMessageChange A lambda to update the message in the bottom bar.
- */
 @Composable
 fun CardDetailScreen(
     getCardById: suspend (Int?) -> FlashCard?,
@@ -42,19 +32,14 @@ fun CardDetailScreen(
     //onNavigateBack: () -> Unit,
     onMessageChange: (String) -> Unit
 ) {
-    // This state will hold the specific card object from DB (for ID reference)
     var card by remember { mutableStateOf<FlashCard?>(null) }
 
-    // Editable states for the text fields
     var englishText by remember { mutableStateOf("") }
     var vietnameseText by remember { mutableStateOf("") }
 
-    // Coroutine scope to run operations.
     val scope = rememberCoroutineScope()
 
-    // Fetch card data
     LaunchedEffect(key1 = Unit) {
-        //val fetchedCard = getCardById(cardId)
         card = getCardById(cardId)
         if (card != null) {
             englishText = card?.englishCard ?: ""
@@ -70,68 +55,61 @@ fun CardDetailScreen(
             .fillMaxSize()
             .padding(24.dp)
     ) {
-        // Only display the content if the card has been fully loaded.
-        if (card != null) {
-            OutlinedTextField(
-                value = englishText,
-                onValueChange = { englishText = it },
-                label = { Text("English") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-            Spacer(Modifier.height(12.dp))
-            OutlinedTextField(
-                value = vietnameseText,
-                onValueChange = { vietnameseText = it },
-                label = { Text("Vietnamese") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-            Spacer(Modifier.height(24.dp))
+        OutlinedTextField(
+            value = englishText,
+            onValueChange = { englishText = it },
+            label = { Text("English") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        Spacer(Modifier.height(12.dp))
+        OutlinedTextField(
+            value = vietnameseText,
+            onValueChange = { vietnameseText = it },
+            label = { Text("Vietnamese") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        Spacer(Modifier.height(24.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                /* // Delete Button
-                Button(
-                    onClick = {
-                        scope.launch {
-                            card?.let {
-                                deleteCard(it)
-                                onMessageChange("Card deleted")
-                                onNavigateBack()
-                            }
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                ) {
-                    Text("Delete")
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                */
-
-                // Save Button
-                Button(
-                    onClick = {
-                        scope.launch {
-                            // Create a new object with same ID but new properties
-                            val updatedCard = card!!.copy(
-                                englishCard = englishText,
-                                vietnameseCard = vietnameseText
-                            )
-                            updateCard(updatedCard)
-                            onMessageChange("Card saved")
-                            //onNavigateBack()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            /*
+            Button(
+                onClick = {
+                    scope.launch {
+                        card?.let {
+                            deleteCard(it)
+                            onMessageChange("Card deleted")
+                            onNavigateBack()
                         }
                     }
-                ) {
-                    Text("Save")
-                }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+            ) {
+                Text("Delete")
             }
-        } else {
-            // Loading state
-            Text("Loading card details...")
+            Spacer(modifier = Modifier.width(16.dp))
+            */
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        // Create a new object with same ID but new properties
+                        val updatedCard = card?.copy(
+                            englishCard = englishText,
+                            vietnameseCard = vietnameseText
+                        ) ?: return@launch
+                        updateCard(updatedCard)
+                        onMessageChange("Card saved")
+                        //onNavigateBack()
+                    }
+                }
+            ) {
+                Text("Save")
+            }
         }
     }
 }

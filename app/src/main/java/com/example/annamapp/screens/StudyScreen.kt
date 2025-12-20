@@ -143,7 +143,7 @@ fun StudyScreen(
                                         )
                                     )
                                     if (response.code != 200) {
-                                        onMessageChange("response code is not 200")
+                                        onMessageChange("Response code is ${response.code}")
                                         return@withContext null
                                     }
                                     val bytes = Base64.decode(response.message)
