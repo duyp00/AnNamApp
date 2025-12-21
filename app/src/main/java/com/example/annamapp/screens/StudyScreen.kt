@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,7 +51,7 @@ fun StudyScreen(
     pickCardLesson: suspend (Int) -> List<FlashCard>,
     networkService: NetworkService
 ) {
-    val numberOfCardsToStudy = 3
+    var numberOfCardsToStudy by rememberSaveable { mutableStateOf(3) }
     var cardList by remember { mutableStateOf<List<FlashCard>>(emptyList()) }
     var actualNumberofCardsFetched by remember { mutableStateOf(0) }
     var currentIndex by rememberSaveable { mutableStateOf(0) }
@@ -58,6 +61,7 @@ fun StudyScreen(
     val appContext = context.applicationContext
     val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
     var preferences by remember { mutableStateOf<Preferences?>(null) }
+    var showDialog by rememberSaveable { mutableStateOf(false) }
 
     suspend fun loadCards() {
         cardList = pickCardLesson(numberOfCardsToStudy)
@@ -67,21 +71,41 @@ fun StudyScreen(
         if (actualNumberofCardsFetched == 0) {
             onMessageChange("No cards available for study.")
         } else {
-            onMessageChange("Loaded $actualNumberofCardsFetched cards. Tap the text to study.")
+            onMessageChange("Tap the text to study.")
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(numberOfCardsToStudy) {
         //val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
         preferences = preferencesFlow.first()
         loadCards()
     }
 
+    if (showDialog) {
+        TextInputDialog(
+            title = "Enter number of cards to study",
+            onConfirm = { input ->
+                val num = input.toIntOrNull()
+                if (num != null && num > 0) {
+                    numberOfCardsToStudy = num
+                } else {
+                    onMessageChange("Invalid input")
+                }
+            },
+            onDismiss = { showDialog = false }
+        )
+    }
     Column(
         //verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()/*.padding(24.dp)*/,
     ) {
+        Button(
+            onClick = { showDialog = true }, //modifier = Modifier.padding(8.dp)
+        ) {
+            Text("Loaded $actualNumberofCardsFetched cards. Tap to change")
+        }
+        Spacer(modifier = Modifier.height(24.dp))
         //this check is very important since cardList is being fetched asynchronously, or outOfBounds exception with cardList will be thrown
         if (actualNumberofCardsFetched == 0) {
             Text(
@@ -91,27 +115,21 @@ fun StudyScreen(
             )
             return@Column //see return@myLabel in Kotlin
         }
-
         val currentCard = cardList[currentIndex]
         val displayText = (if (isVietnameseVisible) currentCard.vietnameseCard else currentCard.englishCard) ?: ""
         val title = if (isVietnameseVisible) "Vietnamese" else "English"
-
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center
         )
-        Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = displayText,
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.clickable {
-                    isVietnameseVisible = !isVietnameseVisible
-                }
+            modifier = Modifier.clickable { isVietnameseVisible = !isVietnameseVisible }
                 .padding(12.dp),
             textAlign = TextAlign.Center
         )
-        Spacer(modifier = Modifier.height(24.dp))
         Row(
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp),
             modifier = Modifier.padding(8.dp)
@@ -126,7 +144,6 @@ fun StudyScreen(
                     Text("Next")
                 }
             }
-
             Button(
                 onClick = {
                     scope.launch {
@@ -212,4 +229,46 @@ fun sha256ofString(filename: String): String {
         hexString.append(hex)
     }
     return hexString.toString()
+}
+
+@Composable
+fun TextInputDialog(
+    title: String,
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var numberOfCardsAsString by rememberSaveable { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                //fontSize = MaterialTheme.typography.titleSmall.fontSize,
+            )
+        },
+        text = {
+            TextField(
+                value = numberOfCardsAsString,
+                onValueChange = { numberOfCardsAsString = it },
+                singleLine = true
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirm(numberOfCardsAsString)
+                    onDismiss()
+                }
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }

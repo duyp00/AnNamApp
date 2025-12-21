@@ -51,9 +51,7 @@ fun CardDetailScreen(
     }
 
     Column(
-        Modifier
-            .fillMaxSize()
-            .padding(24.dp)
+        Modifier.fillMaxSize().padding(24.dp)
     ) {
         OutlinedTextField(
             value = englishText,
