@@ -52,8 +52,8 @@ fun StudyScreen(
     networkService: NetworkService
 ) {
     var numberOfCardsToStudy by rememberSaveable { mutableStateOf(3) }
-    var cardList by remember { mutableStateOf<List<FlashCard>>(emptyList()) }
-    var actualNumberofCardsFetched by remember { mutableStateOf(0) }
+    var cardList by rememberSaveable { mutableStateOf<List<FlashCard>>(emptyList()) }
+    var actualNumberofCardsFetched by rememberSaveable { mutableStateOf(0) }
     var currentIndex by rememberSaveable { mutableStateOf(0) }
     var isVietnameseVisible by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -62,6 +62,7 @@ fun StudyScreen(
     val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
     var preferences by remember { mutableStateOf<Preferences?>(null) }
     var showDialog by rememberSaveable { mutableStateOf(false) }
+    var hasRun by rememberSaveable { mutableStateOf(false) }
 
     suspend fun loadCards() {
         cardList = pickCardLesson(numberOfCardsToStudy)
@@ -75,10 +76,15 @@ fun StudyScreen(
         }
     }
 
-    LaunchedEffect(numberOfCardsToStudy) {
-        //val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
+    LaunchedEffect(Unit) {
         preferences = preferencesFlow.first()
-        loadCards()
+    }
+
+    if (!hasRun) {
+        LaunchedEffect(numberOfCardsToStudy) {
+            loadCards()
+            hasRun = true
+        }
     }
 
     if (showDialog) {
@@ -86,10 +92,12 @@ fun StudyScreen(
             title = "Enter number of cards to study",
             onConfirm = { input ->
                 val num = input.toIntOrNull()
+                hasRun = false
                 if (num != null && num > 0) {
                     numberOfCardsToStudy = num
                 } else {
                     onMessageChange("Invalid input")
+                    hasRun = true
                 }
             },
             onDismiss = { showDialog = false }
