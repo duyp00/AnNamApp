@@ -16,8 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,14 +34,14 @@ fun SearchResultScreen(
     onNavigateToCard: (Int) -> Unit,
     onMessageChange: (String) -> Unit = {}
 ) {
-    var results by remember { mutableStateOf<List<FlashCard>>(emptyList()) }
-    var selectedCardIds by remember { mutableStateOf(setOf<Int>()) }
+    var results by rememberSaveable { mutableStateOf<List<FlashCard>>(emptyList()) }
+    var selectedCardIds by rememberSaveable { mutableStateOf(setOf<Int>()) }
     val scope = rememberCoroutineScope()
+    var hasLoaded by rememberSaveable { mutableStateOf(false) }
 
     suspend fun refresh() {
         val data = performSearch(filters)
         results = data
-        selectedCardIds = emptySet()
         if (data.isEmpty()) {
             onMessageChange("No cards found")
         } else {
@@ -49,8 +49,11 @@ fun SearchResultScreen(
         }
     }
 
-    LaunchedEffect(Unit) {//key1 = filters would also work, but filters
-        refresh()                                  //only change when navigating to this screen
+    if (!hasLoaded) {
+        LaunchedEffect(Unit) {//key1 = filters would also work, but filters
+            refresh()                                  //only change when navigating to this screen
+            hasLoaded = true
+        }
     }
 
     Column(
@@ -94,7 +97,7 @@ fun SearchResultScreen(
                         onSelectionChange = { checked ->
                             selectedCardIds = if (checked) {
                                 selectedCardIds + card.uid//'+' here is adding element to set, creating new (immutable) set
-                            } else {                              //then reassign to trigger recomposition
+                            } else {                              //then reassign new set object to trigger recomposition
                                 selectedCardIds - card.uid//'-' same as above but removing element
                             }
                         },

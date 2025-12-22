@@ -51,26 +51,29 @@ fun LogInScreen(
             label = { Text("email") }
         )
 
-        Button(onClick = {
-            scope.launch {
-                var isSuccessful = false
-                withContext(Dispatchers.IO) {
+        Button(
+            onClick = {
+                scope.launch {
                     try {
-                        val result = networkService.generateToken(email = UserCredential(email))
-                        //token = result.token
-                        Log.d("FLASHCARD", result.toString())
-                        onMessageChange(result.message)
-                        if (result.code == 200) { isSuccessful = true }
-                        else { return@withContext }
+                        var isSuccessful = false
+                        withContext(Dispatchers.IO) {
+                            val result = networkService.generateToken(email = UserCredential(email))
+                            //token = result.token
+                            Log.d("FLASHCARD", result.toString())
+                            onMessageChange(result.message)
+                            if (result.code == 200) {
+                                isSuccessful = true
+                            } //else { return@withContext }
+                        }
+                        if (isSuccessful) {
+                            onNavigateToTokenScreen(email)
+                        } //else { return@launch }
                     } catch (e: Exception) {
                         onMessageChange("Error in the token request: $e")
                         Log.d("FLASHCARD", "Unexpected exception: $e")
                     }
                 }
-                if (isSuccessful) { onNavigateToTokenScreen(email) }
-                //else { return@launch } //can be omitted because nothing follows
-            }
-        },
+            },
             modifier = Modifier.semantics { contentDescription = "Enter" }
         )
         { Text("Enter") }

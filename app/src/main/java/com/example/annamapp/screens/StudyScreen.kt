@@ -62,8 +62,9 @@ fun StudyScreen(
     val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
     var preferences by remember { mutableStateOf<Preferences?>(null) }
     var showDialog by rememberSaveable { mutableStateOf(false) }
-    var hasRun by rememberSaveable { mutableStateOf(false) }
-
+    var hasLoaded by rememberSaveable { mutableStateOf(false) }
+    //remember: prevent new assignment from being loss (reset to initial assignment) after recomposition
+    //mutableStateOf: make the variable reactive, that is, automatically detect new assignment and trigger recomposition
     suspend fun loadCards() {
         cardList = pickCardLesson(numberOfCardsToStudy)
         actualNumberofCardsFetched = cardList.size
@@ -80,11 +81,11 @@ fun StudyScreen(
         preferences = preferencesFlow.first()
     }
 
-    if (!hasRun) {
+    if (!hasLoaded) {
         LaunchedEffect(numberOfCardsToStudy) {
             loadCards()
-            hasRun = true
-        }
+            hasLoaded = true //mutableStateOf makes hasLoaded reactive, if place before loadCards() it will
+        }                 //cancel the if condition immediately hence LaunchedEffect() will not run
     }
 
     if (showDialog) {
@@ -92,12 +93,11 @@ fun StudyScreen(
             title = "Enter number of cards to study",
             onConfirm = { input ->
                 val num = input.toIntOrNull()
-                hasRun = false
                 if (num != null && num > 0) {
+                    hasLoaded = false
                     numberOfCardsToStudy = num
                 } else {
                     onMessageChange("Invalid input")
-                    hasRun = true
                 }
             },
             onDismiss = { showDialog = false }
@@ -108,12 +108,6 @@ fun StudyScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()/*.padding(24.dp)*/,
     ) {
-        Button(
-            onClick = { showDialog = true }, //modifier = Modifier.padding(8.dp)
-        ) {
-            Text("Loaded $actualNumberofCardsFetched cards. Tap to change")
-        }
-        Spacer(modifier = Modifier.height(24.dp))
         //this check is very important since cardList is being fetched asynchronously, or outOfBounds exception with cardList will be thrown
         if (actualNumberofCardsFetched == 0) {
             Text(
@@ -123,6 +117,13 @@ fun StudyScreen(
             )
             return@Column //see return@myLabel in Kotlin
         }
+        Button(
+            onClick = { showDialog = true }, //modifier = Modifier.padding(8.dp)
+        ) {
+            Text("Loaded $actualNumberofCardsFetched cards. Tap to change")
+        }
+        Spacer(modifier = Modifier.height(24.dp))
+
         val currentCard = cardList[currentIndex]
         val displayText = (if (isVietnameseVisible) currentCard.vietnameseCard else currentCard.englishCard) ?: ""
         val title = if (isVietnameseVisible) "Vietnamese" else "English"
