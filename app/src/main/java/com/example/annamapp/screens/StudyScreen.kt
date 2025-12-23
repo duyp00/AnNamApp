@@ -157,9 +157,10 @@ fun StudyScreen(
                 onClick = {
                     scope.launch {
                         try {
-                            val mediaItem = withContext(Dispatchers.IO) {
+                            val result = withContext(Dispatchers.IO) {
                                 val filename = sha256ofString(displayText)
-                                val file = File(context.filesDir, filename)
+                                val dir = context.filesDir //directory or file path, treated as a file in Linux
+                                val file = File(dir, filename)
                                 if (!file.exists()) {
                                     val response = networkService.fetchAudio(
                                         cardWithCredential = AudioRequestJSON(
@@ -169,15 +170,20 @@ fun StudyScreen(
                                         )
                                     )
                                     if (response.code != 200) {
-                                        onMessageChange("Response code is ${response.code}")
-                                        return@withContext null
+                                        //should not call onMessageChange from non-UI thread
+                                        return@withContext AudioLoadResult.Error("Response code is ${response.code}")
                                     }
                                     val bytes = Base64.decode(response.message)
                                     saveAudioToInternalStorage(file, bytes)
                                 }
                                 val mediaitem = MediaItem.fromUri(file.absolutePath.toUri())
-                                mediaitem
-                            } ?: return@launch
+                                AudioLoadResult.Success(mediaItem = mediaitem)//implicit return
+                            }
+                            if (result.status == "ERROR") {
+                                onMessageChange((result as AudioLoadResult.Error).message)
+                                return@launch
+                            }
+                            val mediaItem = (result as AudioLoadResult.Success).mediaItem
 
                             val player = ExoPlayer.Builder(context).build()
                             player.addListener(object : Player.Listener {
@@ -220,6 +226,16 @@ fun StudyScreen(
     }
 }
 
+sealed class AudioLoadResult {
+    data class Success(val mediaItem: MediaItem) : AudioLoadResult()
+    data class Error(val message: String) : AudioLoadResult()
+    val status : String
+        get() = when (this) {
+            is Success -> "SUCCESS"
+            //is Error -> "ERROR"
+            else -> "ERROR"
+        }
+}
 
 fun saveAudioToInternalStorage(file: File, audioData: ByteArray) {
     FileOutputStream(file).use { fos ->

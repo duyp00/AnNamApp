@@ -56,15 +56,16 @@ fun LogInScreen(
                 scope.launch {
                     try {
                         var isSuccessful = false
-                        withContext(Dispatchers.IO) {
+                        val resMessage = withContext(Dispatchers.IO) {
                             val result = networkService.generateToken(email = UserCredential(email))
                             //token = result.token
                             Log.d("FLASHCARD", result.toString())
-                            onMessageChange(result.message)
                             if (result.code == 200) {
                                 isSuccessful = true
-                            } //else { return@withContext }
+                            }
+                            result.message//implicit return for last line
                         }
+                        onMessageChange(resMessage) //not done in IO thread but in main thread
                         if (isSuccessful) {
                             onNavigateToTokenScreen(email)
                         } //else { return@launch }
