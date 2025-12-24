@@ -89,8 +89,8 @@ fun TokenScreen(
                     }
                     navigateToHome()
                 }
-            })
-        {
+            }
+        ) {
             Text("Enter")
         }
     }

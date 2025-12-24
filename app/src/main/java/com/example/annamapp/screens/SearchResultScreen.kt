@@ -34,8 +34,8 @@ fun SearchResultScreen(
     onNavigateToCard: (Int) -> Unit,
     onMessageChange: (String) -> Unit = {}
 ) {
-    var results by rememberSaveable { mutableStateOf<List<FlashCard>>(emptyList()) }
-    var selectedCardIds by rememberSaveable { mutableStateOf(setOf<Int>()) }
+    var results by rememberSaveable { mutableStateOf<List<FlashCard>>(listOf()) }
+    var selectedCardIds by rememberSaveable { mutableStateOf<Set<Int>>(setOf()) }
     val scope = rememberCoroutineScope()
     var hasLoaded by rememberSaveable { mutableStateOf(false) }
 
@@ -89,7 +89,7 @@ fun SearchResultScreen(
         if (results.isEmpty()) {
             Text(text = "No cards to show", modifier = Modifier.padding(top = 24.dp))
         } else {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                 items(results, /*key = { it.uid }*/) { card ->
                     ResultRow(
                         card = card,
@@ -110,14 +110,14 @@ fun SearchResultScreen(
 }
 
 @Composable
-private fun ResultRow(
+fun ResultRow(
     card: FlashCard,
     isSelected: Boolean,
     onSelectionChange: (Boolean) -> Unit,
     onViewClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(12.dp),
+        modifier = Modifier.fillMaxWidth().padding(3.dp),
         //verticalAlignment = Alignment.CenterVertically,
         //horizontalArrangement = Arrangement.SpaceBetween
     ) {

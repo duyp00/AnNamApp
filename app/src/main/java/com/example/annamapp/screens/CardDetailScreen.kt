@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -19,10 +22,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.annamapp.room_sqlite_db.FlashCard
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
 @Composable
 fun CardDetailScreen(
@@ -38,19 +45,20 @@ fun CardDetailScreen(
     var vietnameseText by rememberSaveable { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     var hasLoaded by rememberSaveable { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var showDeleteAudio by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         card = getCardById(cardId)
-    }
-
-    if (!hasLoaded) {
-        if (card != null) {
-            englishText = card?.englishCard ?: ""
-            vietnameseText = card?.vietnameseCard ?: ""
-            onMessageChange("Edit card details")
-            hasLoaded = true
-        } else {
-            onMessageChange("Card not found")
+        if (!hasLoaded) {
+            if (card != null) {
+                englishText = card?.englishCard ?: ""
+                vietnameseText = card?.vietnameseCard ?: ""
+                onMessageChange("Edit card details")
+                hasLoaded = true
+            } else {
+                onMessageChange("Card not found")
+            }
         }
     }
 
@@ -95,7 +103,15 @@ fun CardDetailScreen(
             }
             Spacer(modifier = Modifier.width(16.dp))
             */
-
+            val deleteAudioButtonText = if (showDeleteAudio) "Cancel Audio Delete" else "Delete Audio"
+            Button(
+                onClick = {
+                    showDeleteAudio = !showDeleteAudio
+                }
+            ) {
+                Text(deleteAudioButtonText)
+            }
+            Spacer(modifier = Modifier.width(16.dp))
             Button(
                 onClick = {
                     scope.launch {
@@ -112,6 +128,62 @@ fun CardDetailScreen(
             ) {
                 Text("Save")
             }
+        }
+        /*val displayList = rememberSaveable(englishText, vietnameseText) {
+            listOf(englishText, vietnameseText)
+        }*/
+        if (showDeleteAudio) {
+            val displayList = rememberSaveable(englishText, vietnameseText) {
+                listOf(englishText, vietnameseText)
+            }
+            //val displayList = rememberSaveable { listOf(englishText, vietnameseText) }
+            //val x = displayList[0]
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                items(displayList) { text ->
+                    WordAudioRow(
+                        word = text,
+                        onDeleteAudio = { audioWordName ->
+                            scope.launch {
+                                val info = withContext(Dispatchers.IO) {
+                                    val filename = sha256ofString(audioWordName)
+                                    val audioFile = File(context.filesDir, filename)
+                                    if (audioFile.exists()) {
+                                        val deleted = audioFile.delete()
+                                        if (deleted) {
+                                            return@withContext "Deleted audio file for \"$audioWordName\""
+                                        } else {
+                                            return@withContext "Failed to delete audio file for \"$audioWordName\""
+                                        }
+                                    } else {
+                                        return@withContext "No audio file found for \"$audioWordName\""
+                                    }
+                                }
+                                onMessageChange(info)
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun WordAudioRow(
+    word: String,
+    onDeleteAudio: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(3.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = word,
+            modifier = Modifier.weight(1f)
+        )
+
+        Button(onClick = { onDeleteAudio(word) }) {
+            Text("Delete Audio")
         }
     }
 }

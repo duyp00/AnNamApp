@@ -52,7 +52,7 @@ fun StudyScreen(
     networkService: NetworkService
 ) {
     var numberOfCardsToStudy by rememberSaveable { mutableStateOf(3) }
-    var cardList by rememberSaveable { mutableStateOf<List<FlashCard>>(emptyList()) }
+    var cardList by rememberSaveable { mutableStateOf<List<FlashCard>>(listOf()) }
     var actualNumberofCardsFetched by rememberSaveable { mutableStateOf(0) }
     var currentIndex by rememberSaveable { mutableStateOf(0) }
     var isVietnameseVisible by rememberSaveable { mutableStateOf(false) }
