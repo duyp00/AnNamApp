@@ -49,7 +49,8 @@ fun SearchResultScreen(
         }
     }
 
-    if (!hasLoaded) {
+    if (!hasLoaded) { //if want to see changes after updating cards, disable this guard, but huge
+                      //performance drop if DB is large just to navigate back or rotate screen
         LaunchedEffect(Unit) {//key1 = filters would also work, but filters
             refresh()                                  //only change when navigating to this screen
             hasLoaded = true

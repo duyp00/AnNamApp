@@ -68,7 +68,7 @@ fun StudyScreen(
     suspend fun loadCards() {
         cardList = pickCardLesson(numberOfCardsToStudy)
         actualNumberofCardsFetched = cardList.size
-        currentIndex = 0
+        currentIndex = 0 //changing numberOfCardsToStudy from higher to lower may cause outOfBounds
         //isVietnameseVisible = false
         if (actualNumberofCardsFetched == 0) {
             onMessageChange("No cards available for study.")

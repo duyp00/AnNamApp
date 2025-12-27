@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -40,7 +39,7 @@ fun CardDetailScreen(
     //onNavigateBack: () -> Unit,
     onMessageChange: (String) -> Unit
 ) {
-    var card by remember { mutableStateOf<FlashCard?>(null) }
+    var card by rememberSaveable { mutableStateOf<FlashCard?>(null) }
     var englishText by rememberSaveable { mutableStateOf("") }
     var vietnameseText by rememberSaveable { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -48,17 +47,17 @@ fun CardDetailScreen(
     val context = androidx.compose.ui.platform.LocalContext.current
     var showDeleteAudio by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        card = getCardById(cardId)
-        if (!hasLoaded) {
-            if (card != null) {
+    if (!hasLoaded) {
+        LaunchedEffect(Unit) {
+            card = getCardById(cardId)
+            //if (card != null) {
                 englishText = card?.englishCard ?: ""
                 vietnameseText = card?.vietnameseCard ?: ""
                 onMessageChange("Edit card details")
                 hasLoaded = true
-            } else {
-                onMessageChange("Card not found")
-            }
+            //} else {
+            //    onMessageChange("Card not found")
+            //}
         }
     }
 

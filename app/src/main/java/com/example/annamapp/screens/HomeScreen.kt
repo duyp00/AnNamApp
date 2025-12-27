@@ -62,9 +62,7 @@ fun HomeScreen(
         onMessageChange(preferences[EMAIL] ?: "")
     }
     Column(
-        modifier = Modifier
-            .padding(24.dp)
-            .fillMaxSize(),
+        modifier = Modifier.padding(24.dp).fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -76,9 +74,7 @@ fun HomeScreen(
 
         Button(
             onClick = onNavigateToStudy,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 .semantics {
                     contentDescription = "navigateToStudyCards"
                 }
@@ -88,9 +84,7 @@ fun HomeScreen(
 
         Button(
             onClick = onNavigateToAdd,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 .semantics {
                     contentDescription = "navigateToAddCard"
                 }
@@ -100,9 +94,7 @@ fun HomeScreen(
 
         Button(
             onClick = onNavigateToSearch,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 .semantics {
                     contentDescription = "navigateToSearchCards"
                 }
@@ -112,9 +104,7 @@ fun HomeScreen(
 
         Button(
             onClick = onNavigateToLogIn,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                 .semantics {
                     contentDescription = "navigateToLogIn"
                 }
@@ -122,10 +112,9 @@ fun HomeScreen(
             Text("Log in")
         }
         Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .semantics { contentDescription = "ExecuteLogout" }, onClick = {
-
+            modifier = Modifier.fillMaxWidth()
+                .semantics { contentDescription = "ExecuteLogout" },
+            onClick = {
                 scope.launch {
                     appContext.dataStore.edit { preferences ->
                         preferences.remove(EMAIL)
@@ -134,7 +123,8 @@ fun HomeScreen(
                     }
                 }
 
-            }) {
+            }
+        ) {
             Text(
                 "Log out",
                 modifier = Modifier.semantics { contentDescription = "Logout" }
