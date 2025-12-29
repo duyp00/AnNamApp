@@ -28,17 +28,14 @@ fun AppNavHost(
     onMessageChange: (String) -> Unit = {},
     networkService: NetworkService
 ) {
-    // Define lambdas for database operations.
+    // Define lambda notions for database operations
     val insertFlashCard: suspend (FlashCard) -> Unit = {
         flashCardDao.insertAll(it)
     }
     val updateFlashCard: suspend (FlashCard) -> Unit = {
         flashCardDao.updateCard(it)
     }
-    /*val getAllCards: suspend () -> List<FlashCard> = {
-        flashCardDao.getAll()
-    }*/
-    val getCardById: suspend (Int?) -> FlashCard? = {
+    val getCardById: suspend (Int) -> FlashCard? = {
         flashCardDao.getCardById(it)
     }
     val deleteCard: suspend (FlashCard) -> Unit = {
@@ -49,6 +46,18 @@ fun AppNavHost(
     }
     val pickCardLesson: suspend (Int) -> List<FlashCard> = {
         flashCardDao.getLesson(it)
+    }
+    val searchFlashCards: suspend (Routes.SearchResults) -> List<FlashCard> = { filters ->
+        if (filters.englishEnabled || filters.vietnameseEnabled) {
+            flashCardDao.searchCards(
+                englishQuery = filters.englishQuery,
+                englishEnabled = filters.englishEnabled,
+                englishWholeWord = filters.englishWholeWord,
+                vietnameseQuery = filters.vietnameseQuery,
+                vietnameseEnabled = filters.vietnameseEnabled,
+                vietnameseWholeWord = filters.vietnameseWholeWord
+            )
+        } else { flashCardDao.getAll() }
     }
 
     // The startDestination parameter now takes the Routes.Home type-safe object directly
@@ -91,9 +100,7 @@ fun AppNavHost(
             val args = backStackEntry.toRoute<Routes.SearchResults>()
             SearchResultScreen(
                 filters = args,
-                performSearch = { filters ->
-                    searchFlashCards(flashCardDao, filters)
-                },
+                performSearch = searchFlashCards,
                 deleteCards = { deletelist ->
                     deletelist.forEach { card -> deleteCard(card) }
                 },
@@ -122,23 +129,5 @@ fun AppNavHost(
             TokenScreen(email = args.email, onMessageChange = onMessageChange,
                 navigateToHome = {navCtrller.navigate(Routes.Home)})
         }
-    }
-}
-
-suspend fun searchFlashCards(
-    flashCardDao: FlashCardDao,
-    filters: Routes.SearchResults
-): List<FlashCard> {
-    return if (filters.englishEnabled || filters.vietnameseEnabled) {
-        flashCardDao.searchCards(
-            englishQuery = filters.englishQuery,
-            englishEnabled = filters.englishEnabled,
-            englishWholeWord = filters.englishWholeWord,
-            vietnameseQuery = filters.vietnameseQuery,
-            vietnameseEnabled = filters.vietnameseEnabled,
-            vietnameseWholeWord = filters.vietnameseWholeWord
-        )
-    } else {
-        flashCardDao.getAll()
     }
 }

@@ -32,10 +32,10 @@ import java.io.File
 
 @Composable
 fun CardDetailScreen(
-    getCardById: suspend (Int?) -> FlashCard?,
+    getCardById: suspend (Int) -> FlashCard?,
     updateCard: suspend (FlashCard) -> Unit,
     //deleteCard: suspend (FlashCard) -> Unit,
-    cardId: Int?,
+    cardId: Int,
     //onNavigateBack: () -> Unit,
     onMessageChange: (String) -> Unit
 ) {

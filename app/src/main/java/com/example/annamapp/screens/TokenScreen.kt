@@ -43,24 +43,19 @@ fun TokenScreen(
         //onMessageChange("Please, introduce your token.")
     }
 
-
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         TextField(
             value = token,
             onValueChange = { token = it },
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .semantics { contentDescription = "tokenTextField" },
             label = { Text("token") }
         )
         Button(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .semantics { contentDescription = "Enter" },
             onClick = {
                 scope.launch {
