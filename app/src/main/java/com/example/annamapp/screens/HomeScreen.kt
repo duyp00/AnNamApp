@@ -10,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -18,13 +17,10 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import com.example.annamapp.EMAIL
-import com.example.annamapp.TOKEN
 import com.example.annamapp.dataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -34,7 +30,7 @@ fun HomeScreen(
     onNavigateToLogIn: () -> Unit,
     onMessageChange: (String) -> Unit = {}
 ) {
-    val scope = rememberCoroutineScope()
+    //val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val appContext = context.applicationContext
     LaunchedEffect(Unit) {
@@ -111,7 +107,7 @@ fun HomeScreen(
         ) {
             Text("Log in")
         }
-        Button(
+        /*Button(
             modifier = Modifier.fillMaxWidth()
                 .semantics { contentDescription = "ExecuteLogout" },
             onClick = {
@@ -122,13 +118,12 @@ fun HomeScreen(
                         onMessageChange(preferences[EMAIL] ?: "")
                     }
                 }
-
             }
         ) {
             Text(
                 "Log out",
                 modifier = Modifier.semantics { contentDescription = "Logout" }
             )
-        }
+        }*/
     }
 }

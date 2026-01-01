@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.example.annamapp.room_sqlite_db.AnNamDatabase
 import com.example.annamapp.ui.CardStudyApp
@@ -62,8 +61,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AnNamAppTheme {
-                val navController = rememberNavController()
-                CardStudyApp(flashCardDao = flashCardDao, navController = navController, networkService = networkService)
+                //val navController = rememberNavController()
+                CardStudyApp(flashCardDao = flashCardDao, /*navController = navController,*/ networkService = networkService)
             }
         }
     }
