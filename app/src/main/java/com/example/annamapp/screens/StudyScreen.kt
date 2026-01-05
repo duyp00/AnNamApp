@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -59,8 +58,6 @@ fun StudyScreen(
     val scope = rememberCoroutineScope()
     val context = androidx.compose.ui.platform.LocalContext.current
     val appContext = context.applicationContext
-    val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
-    var preferences by remember { mutableStateOf<Preferences?>(null) }
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var hasLoaded by rememberSaveable { mutableStateOf(false) }
     //remember: prevent new assignment from being loss (reset to initial assignment) after recomposition
@@ -75,10 +72,6 @@ fun StudyScreen(
         } else {
             onMessageChange("Tap the text to study.")
         }
-    }
-
-    LaunchedEffect(Unit) {
-        preferences = preferencesFlow.first()
     }
 
     if (!hasLoaded) {
@@ -162,11 +155,13 @@ fun StudyScreen(
                                 val dir = context.filesDir //directory or file path, treated as a file in Linux
                                 val file = File(dir, filename)
                                 if (!file.exists()) {
+                                    val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
+                                    val preferences = preferencesFlow.first()
                                     val response = networkService.fetchAudio(
                                         cardWithCredential = AudioRequestJSON(
                                             word = displayText,
-                                            email = preferences?.get(EMAIL) ?: "",
-                                            token = preferences?.get(TOKEN) ?: ""
+                                            email = preferences[EMAIL] ?: return@withContext AudioLoadResult.Error("Email not found"),
+                                            token = preferences[TOKEN] ?: return@withContext AudioLoadResult.Error("Token not found")
                                         )
                                     )
                                     if (response.code != 200) {
