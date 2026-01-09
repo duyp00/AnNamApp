@@ -35,7 +35,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //enableEdgeToEdge()
-        val db = Room.databaseBuilder(applicationContext, AnNamDatabase::class.java, "annamapp_flashcard_db").build()
+        val db = Room.databaseBuilder(applicationContext,
+            AnNamDatabase::class.java, "annamapp_flashcard_db"
+        ).build()
         val flashCardDao = db.flashCardDao()
 
         // Retrofit requires a valid HttpUrl: The baseUrl() method of Retrofit.Builder expects an okhttp3.HttpUrl object.

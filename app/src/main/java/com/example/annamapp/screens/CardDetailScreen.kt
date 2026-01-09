@@ -18,11 +18,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.annamapp.room_sqlite_db.FlashCard
 import kotlinx.coroutines.Dispatchers
@@ -44,11 +46,10 @@ fun CardDetailScreen(
     var vietnameseText by rememberSaveable { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     var hasLoaded by rememberSaveable { mutableStateOf(false) }
-    val context = androidx.compose.ui.platform.LocalContext.current
-    var showDeleteAudio by rememberSaveable { mutableStateOf(false) }
+    val appContext = LocalContext.current.applicationContext
 
-    if (!hasLoaded) {
-        LaunchedEffect(Unit) {
+    LaunchedEffect(Unit) {
+        if (!hasLoaded) {
             card = getCardById(cardId)
             //if (card != null) {
                 englishText = card?.englishCard ?: ""
@@ -60,10 +61,23 @@ fun CardDetailScreen(
             //}
         }
     }
+    suspend fun getAudioFileForText(text: String): FileLoadforWord {
+        val filename = withContext(Dispatchers.Default) {
+            sha256ofString(text)
+        }
+        return withContext(Dispatchers.IO) {
+            val audioFile = File(appContext.filesDir, filename)
+            FileLoadforWord(
+                file = audioFile,
+                exists = audioFile.exists()
+            )
+        }
+    }
 
     Column(
         Modifier.fillMaxSize().padding(24.dp)
     ) {
+        var showDeleteAudio by rememberSaveable { mutableStateOf(false) }
         OutlinedTextField(
             value = englishText,
             onValueChange = { englishText = it },
@@ -128,10 +142,8 @@ fun CardDetailScreen(
                 Text("Save")
             }
         }
-        /*val displayList = rememberSaveable(englishText, vietnameseText) {
-            listOf(englishText, vietnameseText)
-        }*/
         if (showDeleteAudio) {
+            //live IO file existence check!! fires recomposition as user types in text fields
             val displayList = rememberSaveable(englishText, vietnameseText) {
                 listOf(englishText, vietnameseText)
             }
@@ -139,28 +151,32 @@ fun CardDetailScreen(
             //val x = displayList[0]
             LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                 items(displayList) { text ->
-                    WordAudioRow(
-                        word = text,
-                        onDeleteAudio = { audioWordName ->
-                            scope.launch {
-                                val info = withContext(Dispatchers.IO) {
-                                    val filename = sha256ofString(audioWordName)
-                                    val audioFile = File(context.filesDir, filename)
-                                    if (audioFile.exists()) {
-                                        val deleted = audioFile.delete()
-                                        if (deleted) {
-                                            return@withContext "Deleted audio file for \"$audioWordName\""
-                                        } else {
-                                            return@withContext "Failed to delete audio file for \"$audioWordName\""
+                    val fileLoadState =
+                    produceState<FileLoadforWord?>(initialValue = null, key1 = text)
+                    { value = getAudioFileForText(text) }
+                    //produceState uses remember internally, so will rerun when config changes
+                    val fileLoad = fileLoadState.value
+                    if (fileLoad != null) {
+                        val audioFile = fileLoad.file
+                        if (fileLoad.exists) {
+                            WordAudioRow(
+                                word = text,
+                                onDeleteAudio = { audioWordName ->
+                                    scope.launch {
+                                        val info = withContext(Dispatchers.IO) {
+                                            val deleted = audioFile.delete()
+                                            if (deleted) {
+                                                return@withContext "Deleted audio file for \"$audioWordName\""
+                                            } else {
+                                                return@withContext "Failed to delete audio file for \"$audioWordName\""
+                                            }
                                         }
-                                    } else {
-                                        return@withContext "No audio file found for \"$audioWordName\""
+                                        onMessageChange(info)
                                     }
                                 }
-                                onMessageChange(info)
-                            }
-                        }
-                    )
+                            )
+                        } else { Text("No audio for \"$text\"") }
+                    } else { Text("Checking...") }
                 }
             }
         }
@@ -186,3 +202,8 @@ fun WordAudioRow(
         }
     }
 }
+
+data class FileLoadforWord(
+    val file: File,
+    val exists: Boolean
+)

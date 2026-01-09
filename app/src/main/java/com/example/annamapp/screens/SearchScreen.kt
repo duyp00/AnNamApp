@@ -35,9 +35,6 @@ fun SearchScreen(
     var vietnameseEnabled by rememberSaveable { mutableStateOf(true) }
     var vietnameseWholeWord by rememberSaveable { mutableStateOf(false) }
 
-    val canSearch = (englishEnabled && englishQuery.isNotBlank()) ||
-            (vietnameseEnabled && vietnameseQuery.isNotBlank())
-
     LaunchedEffect(Unit) {
         onMessageChange("Enable a field, enter text, then search")
     }
@@ -70,6 +67,8 @@ fun SearchScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            val canSearch = (englishEnabled && englishQuery.isNotBlank())
+                || (vietnameseEnabled && vietnameseQuery.isNotBlank())
             Button(
                 modifier = Modifier.weight(1f),
                 enabled = canSearch,

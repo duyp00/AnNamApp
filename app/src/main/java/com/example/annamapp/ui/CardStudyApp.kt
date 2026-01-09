@@ -50,28 +50,20 @@ fun CardStudyApp(
     val context = LocalContext.current
     val appContext = context.applicationContext
 
-    // --- FIX: Use string-based routes for Scaffold logic ---
-
-    // 1. Get the qualified name of the home route. This is our default.
+    // 1. Observe the nav back stack entry
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    // 2. Get the qualified name of the home route.
     // e.g., "com.example.annamapp.navigation.Routes.Home"
     val homeRouteString = Routes.Home::class.qualifiedName
-
-    // 2. Observe the nav back stack entry
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-
     // 3. Get the current route as a STRING. Default to home.
     val currentRouteString = navBackStackEntry?.destination?.route
 
-    // 4. Compare strings to determine if the back button should be shown.
-    val showBack = currentRouteString != homeRouteString
-
-    // --- END FIX ---
-
     var message by rememberSaveable { mutableStateOf("") }
 
-    // Top-level Scaffold
     Scaffold(
         topBar = {
+            // 4. Compare strings to determine if the back button should be shown.
+            val showBack = currentRouteString != homeRouteString
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(end = 15.dp, start = 10.dp, top = 20.dp)
@@ -136,8 +128,6 @@ fun CardStudyApp(
     }
 }
 
-// --- FIX: Update helper function to work with route strings ---
-@Composable
 fun titleForRoute(route: String?): String {
     // Compare the route string against the qualified name of each route class
     return when {
@@ -157,4 +147,3 @@ fun titleForRoute(route: String?): String {
         else -> "New screen"
     }
 }
-// --- END FIX ---

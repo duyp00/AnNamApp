@@ -18,6 +18,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.retain.RetainedEffect
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -60,6 +62,47 @@ fun StudyScreen(
     val appContext = context.applicationContext
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var hasLoaded by rememberSaveable { mutableStateOf(false) }
+    var isPlayerPlaying by rememberSaveable { mutableStateOf(false) }
+    var playerState by rememberSaveable { mutableStateOf(0) }
+    //move player out of onClick so it is not re-created on every click
+    var player by retain { mutableStateOf<ExoPlayer?>(null) }
+    fun instantiatePlayer(): ExoPlayer {
+        return ExoPlayer.Builder(appContext).build().apply {//for retain(), use app context instead of
+            addListener(object: Player.Listener { //activity context to avoid memory leaks
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    when (playbackState) {
+                        Player.STATE_BUFFERING -> {
+                            onMessageChange("Buffering...")
+                            playerState = 2
+                        }
+                        Player.STATE_READY -> { // Player is prepared and ready to play
+                            onMessageChange("Ready")
+                            playerState = 3
+                        }
+                        Player.STATE_ENDED -> {
+                            onMessageChange("Finished")
+                            playerState = 4
+                        }
+                        Player.STATE_IDLE -> Unit // Player is idle, e.g., after release or error
+                    }
+                }
+                override fun onIsPlayingChanged(isPlaying: Boolean) {
+                    isPlayerPlaying = isPlaying
+                }
+            })
+        }
+    }
+    RetainedEffect(Unit) {
+        onRetire {
+            if (player != null) {
+                player!!.release()
+                player = null
+                onMessageChange("Player released")
+            }
+        }
+    }
+    //retain is new API (now stable Dec 2025). kinda between remember and rememberSaveable (survives config changes,
+    //not process death). refer https://developer.android.com/develop/ui/compose/state-lifespans#retain
     //remember: prevent new assignment from being loss (reset to initial assignment) after recomposition
     //mutableStateOf: make the variable reactive, that is, automatically detect new assignment and trigger recomposition
     suspend fun loadCards() {
@@ -74,11 +117,11 @@ fun StudyScreen(
         }
     }
 
-    if (!hasLoaded) {
-        LaunchedEffect(numberOfCardsToStudy) {
+    LaunchedEffect(numberOfCardsToStudy) {
+        if (!hasLoaded) {
             loadCards()
-            hasLoaded = true //mutableStateOf makes hasLoaded reactive, if place before loadCards() it will
-        }                 //cancel the if condition immediately hence LaunchedEffect() will not run
+            hasLoaded = true
+        }
     }
 
     if (showDialog) {
@@ -116,20 +159,24 @@ fun StudyScreen(
             Text("Loaded $actualNumberofCardsFetched cards. Tap to change")
         }
         Spacer(modifier = Modifier.height(24.dp))
-
         val currentCard = cardList[currentIndex]
         val displayText = (if (isVietnameseVisible) currentCard.vietnameseCard else currentCard.englishCard) ?: ""
-        val title = if (isVietnameseVisible) "Vietnamese" else "English"
+        var playNew by rememberSaveable { mutableStateOf(true) }
+
         Text(
-            text = title,
+            text = if (isVietnameseVisible) "Vietnamese" else "English",
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center
         )
         Text(
             text = displayText,
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.clickable { isVietnameseVisible = !isVietnameseVisible }
-                .padding(12.dp),
+            modifier = Modifier.clickable {
+                isVietnameseVisible = !isVietnameseVisible
+                //to play new audio if switched during playing, click pause then play
+                playNew = true
+                //player.stop()
+            }.padding(12.dp),
             textAlign = TextAlign.Center
         )
         Row(
@@ -138,10 +185,10 @@ fun StudyScreen(
         ) {
             if (isVietnameseVisible) {
                 Button(onClick = {
-                    scope.launch {
-                        currentIndex = (currentIndex + 1) % actualNumberofCardsFetched
-                        isVietnameseVisible = false
-                    }
+                    currentIndex = (currentIndex + 1) % actualNumberofCardsFetched
+                    isVietnameseVisible = false
+                    //same reason as above
+                    playNew = true
                 }) {
                     Text("Next")
                 }
@@ -149,82 +196,75 @@ fun StudyScreen(
             Button(
                 onClick = {
                     scope.launch {
-                        try {
-                            val result = withContext(Dispatchers.IO) {
-                                val filename = sha256ofString(displayText)
-                                val dir = context.filesDir //directory or file path, treated as a file in Linux
-                                val file = File(dir, filename)
-                                if (!file.exists()) {
-                                    val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
-                                    val preferences = preferencesFlow.first()
-                                    val response = networkService.fetchAudio(
-                                        cardWithCredential = AudioRequestJSON(
-                                            word = displayText,
-                                            email = preferences[EMAIL] ?: return@withContext AudioLoadResult.Error("Email not found"),
-                                            token = preferences[TOKEN] ?: return@withContext AudioLoadResult.Error("Token not found")
-                                        )
-                                    )
-                                    if (response.code != 200) {
-                                        //should not call onMessageChange from non-UI thread
-                                        return@withContext AudioLoadResult.Error("Response code is ${response.code}")
+                        try { //non-null asserted is used since player is instantiated before use
+                            if (isPlayerPlaying) {
+                                player!!.pause()
+                            } else {
+                                if (playNew) {
+                                    val filename = withContext(Dispatchers.Default) {
+                                        sha256ofString(displayText)
                                     }
-                                    val bytes = Base64.decode(response.message)
-                                    saveAudioToInternalStorage(file, bytes)
-                                }
-                                val mediaitem = MediaItem.fromUri(file.absolutePath.toUri())
-                                AudioLoadResult.Success(mediaItem = mediaitem)//implicit return
-                            }
-                            if (result.status == "ERROR") {
-                                onMessageChange((result as AudioLoadResult.Error).message)
-                                return@launch
-                            }
-                            val mediaItem = (result as AudioLoadResult.Success).mediaItem
-
-                            val player = ExoPlayer.Builder(context).build()
-                            player.addListener(object : Player.Listener {
-                                override fun onPlaybackStateChanged(playbackState: Int) {
-                                    when (playbackState) {
-                                        Player.STATE_BUFFERING -> {
-                                            // Player is buffering, show a loading indicator if desired
-                                            onMessageChange("Buffering...")
+                                    val result = withContext(Dispatchers.IO) {
+                                        //directory or file path, treated as a file in Linux
+                                        val dir = appContext.filesDir
+                                        val file = File(dir, filename)
+                                        if (!file.exists()) {
+                                            val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
+                                            val preferences: Preferences = preferencesFlow.first()
+                                            val response = networkService.fetchAudio(
+                                                cardWithCredential = AudioRequestJSON(
+                                                    word = displayText,
+                                                    email = preferences[EMAIL] ?: return@withContext
+                                                    AudioLoadResult.Error("Email not found"),
+                                                    token = preferences[TOKEN] ?: return@withContext
+                                                    AudioLoadResult.Error("Token not found")
+                                                )
+                                            )
+                                            if (response.code != 200) {
+                                                //should not call onMessageChange from non-UI thread
+                                                return@withContext AudioLoadResult.Error(
+                                                    "Response code is ${response.code}"
+                                                )
+                                            }
+                                            val bytes = Base64.decode(response.message)
+                                            saveAudioToInternalStorage(file, bytes)
                                         }
-
-                                        Player.STATE_READY -> {
-                                            // Player is prepared and ready to play
-                                            onMessageChange("Ready")
-                                        }
-
-                                        Player.STATE_ENDED -> {
-                                            // Playback has finished
-                                            player.release()
-                                            onMessageChange("Finished")
-                                        }
-
-                                        Player.STATE_IDLE -> {
-                                            // Player is idle, e.g., after release or error
-                                        }
+                                        val mediaitem = MediaItem.fromUri(file.absolutePath.toUri())
+                                        AudioLoadResult.Success(mediaItem = mediaitem)//implicit return
                                     }
+                                    if (result.status == "ERROR") {
+                                        onMessageChange((result as AudioLoadResult.Error).message)
+                                        return@launch
+                                    }
+                                    val mediaItem = (result as AudioLoadResult.Success).mediaItem
+                                    if (player == null) { player = instantiatePlayer() }
+                                    player!!.setMediaItem(mediaItem)
+                                    player!!.prepare()
+                                    playNew = false
+                                } else if (playerState == 4) {
+                                    //no need to set media again. go to start of audio
+                                    player!!.seekTo(0)
                                 }
-                            })
-                            player.setMediaItem(mediaItem)
-                            player.prepare()
-                            player.play()
+                                player!!.play()
+                            }
                         } catch (e: Exception) {
                             onMessageChange("$e")
                         }
                     }
                 },
-            ) {
-                Text("Play sound")
-            }
+            ){ Text(
+                if (isPlayerPlaying) {"Pause Audio"}
+                else if (playNew) {"Play Audio"}
+                else {"Resume Audio"}
+            )}
         }
     }
 }
 
 sealed class AudioLoadResult {
-    data class Success(val mediaItem: MediaItem) : AudioLoadResult()
-    data class Error(val message: String) : AudioLoadResult()
-    val status : String
+    data class Success(val mediaItem: MediaItem): AudioLoadResult()
+    data class Error(val message: String): AudioLoadResult()
+    val status: String
         get() = when (this) {
             is Success -> "SUCCESS"
             //is Error -> "ERROR"
@@ -238,8 +278,8 @@ fun saveAudioToInternalStorage(file: File, audioData: ByteArray) {
     }
 }
 
-fun sha256ofString(filename: String): String {
-    val bytes = filename.toByteArray()
+fun sha256ofString(string: String): String {
+    val bytes = string.toByteArray()
     val message_digest = java.security.MessageDigest.getInstance("SHA-256")
     val digestBytes = message_digest.digest(bytes)
     val hexString = StringBuilder()

@@ -40,19 +40,20 @@ fun SearchResultScreen(
     var hasLoaded by rememberSaveable { mutableStateOf(false) }
 
     suspend fun refresh() {
-        val data = performSearch(filters)
-        results = data
-        if (data.isEmpty()) {
+        results = performSearch(filters)
+        //selectedCardIds = setOf() //clear selection on refresh
+        if (results.isEmpty()) {
             onMessageChange("No cards found")
         } else {
             onMessageChange("Tap a card or use Delete to remove selected")
         }
     }
 
-    if (!hasLoaded) { //if want to see changes after updating cards, disable this guard, but huge
-                      //performance drop if DB is large just to navigate back or rotate screen
-        LaunchedEffect(Unit) {//key1 = filters would also work, but filters
-            refresh()                                  //only change when navigating to this screen
+    LaunchedEffect(Unit) {
+        //key1 = filters would also work, but filters only change when navigating to this screen
+        if (!hasLoaded) { //if want to see changes after updating cards, disable this guard,
+            //but huge performance drop if DB is large just to navigate back
+            refresh()
             hasLoaded = true
         }
     }

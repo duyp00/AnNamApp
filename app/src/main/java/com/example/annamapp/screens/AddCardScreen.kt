@@ -1,7 +1,6 @@
 package com.example.annamapp.screens
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -54,31 +53,29 @@ fun AddCardScreen(
         }
         else { {} }*/
 
-        Row {
-            Button(onClick = {
-                //clickOnAdd = true
-                scope.launch {
-                    try {
-                        if (findByWord(enWord, vnWord) != null) {
-                            throw SQLiteException("Card already exists in database.")
-                        }
-                        insertFlashCard(
-                            FlashCard(
-                                uid = 0, //best value to choose is 0 since it's auto-generated
-                                englishCard = enWord,
-                                vietnameseCard = vnWord
-                            )
-                        )
-                        onMessageChange("Added card: [$enWord, $vnWord]")
-                    } catch (ex: Exception) {
-                        onMessageChange("$ex") //equivalent to ex.toString() (no double quotes). if more friendly: ex.localizedMessage
-                    } finally {
-                        enWord = ""
-                        vnWord = ""
+        Button(onClick = {
+            //clickOnAdd = true
+            scope.launch {
+                try {
+                    if (findByWord(enWord, vnWord) != null) {
+                        throw SQLiteException("Card already exists in database.")
                     }
+                    insertFlashCard(
+                        FlashCard(
+                            uid = 0, //best value to choose is 0 since it's auto-generated
+                            englishCard = enWord,
+                            vietnameseCard = vnWord
+                        )
+                    )
+                    onMessageChange("Added card: [$enWord, $vnWord]")
+                } catch (ex: Exception) {
+                    onMessageChange("$ex") //equivalent to ex.toString() (no double quotes). if more friendly: ex.localizedMessage
+                } finally {
+                    enWord = ""
+                    vnWord = ""
                 }
-            }, modifier = Modifier.semantics { contentDescription = "add_card_button" })
-            { Text("Add") }
-        }
+            }
+        }, modifier = Modifier.semantics { contentDescription = "add_card_button" })
+        { Text("Add") }
     }
 }

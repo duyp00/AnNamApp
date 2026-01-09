@@ -17,6 +17,7 @@ junit = "4.13.2"
 
 #espressoCore = "3.7.0"
 
+#kotlinxCoroutinesCore = "1.10.2"
 kotlinxSerializationJson = "1.9.0"
 lifecycleRuntimeKtx = "2.10.0"
 
@@ -84,6 +85,7 @@ androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navig
 
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 
+#kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit2-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }

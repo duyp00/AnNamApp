@@ -8,10 +8,12 @@ interface NetworkService {
     @PUT
     suspend fun generateToken(
         @Url url: String = "https://egsbwqh7kildllpkijk6nt4soq0wlgpe.lambda-url.ap-southeast-1.on.aws/",
-        @Body email: UserCredential): ResponseJSON
+        @Body email: UserCredential
+    ): ResponseJSON
 
     @PUT
     suspend fun fetchAudio(
         @Url url: String = "https://ityqwv3rx5vifjpyufgnpkv5te0ibrcx.lambda-url.ap-southeast-1.on.aws/",
-        @Body cardWithCredential: AudioRequestJSON): ResponseJSON
+        @Body cardWithCredential: AudioRequestJSON
+    ): ResponseJSON
 }

@@ -17,4 +17,4 @@ import kotlinx.parcelize.Parcelize
     @PrimaryKey(autoGenerate = true) val uid: Int,
     @ColumnInfo(name = "english_card") val englishCard: String?,
     @ColumnInfo(name = "vietnamese_card") val vietnameseCard: String?
-) : Parcelable
+): Parcelable
