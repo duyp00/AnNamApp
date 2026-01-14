@@ -86,7 +86,7 @@ fun AppNavHost(
         composable<Routes.Search> {
             SearchScreen(
                 onSearch = { filters -> navCtrller.navigate(filters) },
-                onShowAllCards = { navCtrller.navigate(Routes.SearchResults()) },
+                onShowAllCards = { filters -> navCtrller.navigate(filters) },
                 onMessageChange = onMessageChange
             )
         }

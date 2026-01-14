@@ -24,7 +24,7 @@ import com.example.annamapp.navigation.Routes
 @Composable
 fun SearchScreen(
     onSearch: (Routes.SearchResults) -> Unit,
-    onShowAllCards: () -> Unit,
+    onShowAllCards: (Routes.SearchResults) -> Unit,
     onMessageChange: (String) -> Unit = {}
 ) {
     var englishQuery by rememberSaveable { mutableStateOf("") }
@@ -67,8 +67,7 @@ fun SearchScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            val canSearch = (englishEnabled && englishQuery.isNotBlank())
-                || (vietnameseEnabled && vietnameseQuery.isNotBlank())
+            val canSearch = englishEnabled || vietnameseEnabled
             Button(
                 modifier = Modifier.weight(1f),
                 enabled = canSearch,
@@ -78,14 +77,14 @@ fun SearchScreen(
                         onMessageChange("Select at least one field and enter text")
                         return@Button //early abort since there is nothing to search (read kotlin return@ for more)
                     }*/
-
+                    //under specific circumstances, Search button can behave identical to Show all cards
                     val filters = Routes.SearchResults(
-                        englishQuery = englishQuery.trim(),
-                        englishEnabled = englishEnabled && englishQuery.isNotBlank(),
-                        englishWholeWord = englishWholeWord /*&& englishEnabled*/,
-                        vietnameseQuery = vietnameseQuery.trim(),
-                        vietnameseEnabled = vietnameseEnabled && vietnameseQuery.isNotBlank(),
-                        vietnameseWholeWord = vietnameseWholeWord /*&& vietnameseEnabled*/
+                        englishQuery = englishQuery/*.trim()*/,
+                        englishEnabled = englishEnabled /*&& englishQuery.isNotBlank()*/,//isNotBlank() can
+                        englishWholeWord = englishWholeWord,     //silently alter user intention, so be cautious
+                        vietnameseQuery = vietnameseQuery/*.trim()*/,
+                        vietnameseEnabled = vietnameseEnabled /*&& vietnameseQuery.isNotBlank()*/,
+                        vietnameseWholeWord = vietnameseWholeWord
                     )
                     onSearch(filters)
                 }
@@ -95,7 +94,17 @@ fun SearchScreen(
 
             Button(
                 modifier = Modifier.weight(1f),
-                onClick = onShowAllCards
+                onClick = {
+                    val filters = Routes.SearchResults(
+                        englishQuery = "",
+                        englishEnabled = false,
+                        englishWholeWord = false,
+                        vietnameseQuery = "",
+                        vietnameseEnabled = false,
+                        vietnameseWholeWord = false
+                    )
+                    onShowAllCards(filters)
+                }
             ) {
                 Text("Show all cards")
             }
@@ -133,7 +142,7 @@ fun SearchFieldSection(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             CheckboxRow(
-                text = "Search $label",
+                text = "Match $label",
                 checked = enabled,
                 onCheckedChange = onEnabledChange
             )

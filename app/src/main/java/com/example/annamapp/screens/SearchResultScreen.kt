@@ -133,7 +133,7 @@ fun ResultRow(
         }
 
         Button(onClick = onViewClick) {
-            Text("View")
+            Text("Edit")
         }
     }
 }

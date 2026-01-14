@@ -25,12 +25,12 @@ sealed interface Routes {
 
     @Serializable
     data class SearchResults(
-        val englishQuery: String = "",
-        val englishEnabled: Boolean = false,
-        val englishWholeWord: Boolean = false,
-        val vietnameseQuery: String = "",
-        val vietnameseEnabled: Boolean = false,
-        val vietnameseWholeWord: Boolean = false
+        val englishQuery: String,
+        val englishEnabled: Boolean,
+        val englishWholeWord: Boolean,
+        val vietnameseQuery: String,
+        val vietnameseEnabled: Boolean,
+        val vietnameseWholeWord: Boolean
     )
 
     /**
