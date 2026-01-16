@@ -55,17 +55,17 @@ fun HomeScreen(
         //where you only need a single, immediate result from a potentially long-running data stream.
         val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
         val preferences = preferencesFlow.first()
-        onMessageChange(preferences[EMAIL] ?: "")
+        onMessageChange(preferences[EMAIL] ?: "Created by Phạm Duy")
     }
     Column(
-        modifier = Modifier.padding(24.dp).fillMaxSize(),
+        modifier = Modifier.padding(horizontal = 24.dp).fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             "Menu",
             style = MaterialTheme.typography.headlineMedium, // M3 typography scale
-            modifier = Modifier.padding(bottom = 24.dp)
+            //modifier = Modifier.padding(bottom = 12.dp)
         )
 
         Button(

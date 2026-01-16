@@ -31,7 +31,7 @@ fun SearchResultScreen(
     filters: Routes.SearchResults,
     performSearch: suspend (Routes.SearchResults) -> List<FlashCard>,
     deleteCards: suspend (List<FlashCard>) -> Unit,
-    onNavigateToCard: (Int) -> Unit,
+    onNavigateToCard: (String, String) -> Unit,
     onMessageChange: (String) -> Unit = {}
 ) {
     var results by rememberSaveable { mutableStateOf<List<FlashCard>>(listOf()) }
@@ -103,7 +103,10 @@ fun SearchResultScreen(
                                 selectedCardIds - card.uid//'-' same as above but removing element
                             }
                         },
-                        onViewClick = { onNavigateToCard(card.uid) }
+                        onViewClick = {
+                            onNavigateToCard(card.englishCard.orEmpty(), card.vietnameseCard.orEmpty())
+                            hasLoaded = false //to refresh results when navigating back
+                        }
                     )
                 }
             }

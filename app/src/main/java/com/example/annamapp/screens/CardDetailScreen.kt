@@ -20,40 +20,60 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.retain.RetainedEffect
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
 import com.example.annamapp.room_sqlite_db.FlashCard
+import com.example.annamapp.ui.NetworkService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 
 @Composable
 fun CardDetailScreen(
-    getCardById: suspend (Int) -> FlashCard?,
+    enWord: String,
+    vnWord: String,
     updateCard: suspend (FlashCard) -> Unit,
-    //deleteCard: suspend (FlashCard) -> Unit,
-    cardId: Int,
-    //onNavigateBack: () -> Unit,
-    onMessageChange: (String) -> Unit
+    onNavigateBack: () -> Unit,
+    onMessageChange: (String) -> Unit,
+    findByWord: suspend (String, String) -> FlashCard?,
+    networkService: NetworkService
+    /*deleteCard: suspend (FlashCard) -> Unit,*/
+    /*getCardById: suspend (Int) -> FlashCard?,*/ /*cardId: Int,*/
 ) {
-    var card by rememberSaveable { mutableStateOf<FlashCard?>(null) }
-    var englishText by rememberSaveable { mutableStateOf("") }
-    var vietnameseText by rememberSaveable { mutableStateOf("") }
+    //var card by rememberSaveable { mutableStateOf<FlashCard?>(null) }
+    var englishText by rememberSaveable { mutableStateOf(enWord) }
+    var vietnameseText by rememberSaveable { mutableStateOf(vnWord) }
     val scope = rememberCoroutineScope()
     var hasLoaded by rememberSaveable { mutableStateOf(false) }
     val appContext = LocalContext.current.applicationContext
+    //move player out of onClick so it is not re-created on every click
+    var player by retain { mutableStateOf<ExoPlayer?>(null) }
+
+    RetainedEffect(Unit) {
+        onRetire {
+            if (player != null) {
+                player!!.release()
+                player = null
+                onMessageChange("Player released")
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         if (!hasLoaded) {
-            card = getCardById(cardId)
+            //card = getCardById(cardId)
             //if (card != null) {
-                englishText = card?.englishCard ?: ""
-                vietnameseText = card?.vietnameseCard ?: ""
+                //englishText = card?.englishCard ?: ""
+                //vietnameseText = card?.vietnameseCard ?: ""
                 onMessageChange("Edit card details")
                 hasLoaded = true
             //} else {
@@ -61,23 +81,11 @@ fun CardDetailScreen(
             //}
         }
     }
-    suspend fun getAudioFileForText(text: String): FileLoadforWord {
-        val filename = withContext(Dispatchers.Default) {
-            sha256ofString(text)
-        }
-        return withContext(Dispatchers.IO) {
-            val audioFile = File(appContext.filesDir, filename)
-            FileLoadforWord(
-                file = audioFile,
-                exists = audioFile.exists()
-            )
-        }
-    }
 
     Column(
         Modifier.fillMaxSize().padding(24.dp)
     ) {
-        var showDeleteAudio by rememberSaveable { mutableStateOf(false) }
+        var openAudioPanel by rememberSaveable { mutableStateOf(false) }
         OutlinedTextField(
             value = englishText,
             onValueChange = { englishText = it },
@@ -99,8 +107,7 @@ fun CardDetailScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            /*
-            Button(
+            /*Button(
                 onClick = {
                     scope.launch {
                         card?.let {
@@ -111,15 +118,12 @@ fun CardDetailScreen(
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-            ) {
-                Text("Delete")
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            */
-            val deleteAudioButtonText = if (showDeleteAudio) "Cancel Audio Delete" else "Delete Audio"
+            ) { Text("Delete") }
+            Spacer(modifier = Modifier.width(16.dp))*/
+            val deleteAudioButtonText = if (openAudioPanel) "Close Audio Panel" else "Manage Audio"
             Button(
                 onClick = {
-                    showDeleteAudio = !showDeleteAudio
+                    openAudioPanel = !openAudioPanel
                 }
             ) {
                 Text(deleteAudioButtonText)
@@ -129,43 +133,48 @@ fun CardDetailScreen(
                 onClick = {
                     scope.launch {
                         // Create a new object with same ID but new properties
-                        val updatedCard = card?.copy(
+                        /*val updatedCard = card?.copy(
+                            englishCard = englishText,
+                            vietnameseCard = vietnameseText
+                        ) ?: return@launch*/
+                        val updatedCard = findByWord(enWord, vnWord)?.copy(
                             englishCard = englishText,
                             vietnameseCard = vietnameseText
                         ) ?: return@launch
                         updateCard(updatedCard)
-                        onMessageChange("Card saved")
-                        //onNavigateBack()
+                        //onMessageChange("Card updated") //disabled because navigating back
+                        onNavigateBack()                  //immediately overrides message
                     }
                 }
             ) {
-                Text("Save")
+                Text("Update card")
             }
         }
-        if (showDeleteAudio) {
-            //live IO file existence check!! fires recomposition as user types in text fields
-            val displayList = rememberSaveable(englishText, vietnameseText) {
-                listOf(englishText, vietnameseText)
-            }
-            //val displayList = rememberSaveable { listOf(englishText, vietnameseText) }
-            //val x = displayList[0]
+        if (openAudioPanel) {
+            //live IO file check disabled due to duplicate string case, which crashes compose
+            //val displayList = rememberSaveable(englishText, vietnameseText) {
+            //    listOf(englishText, vietnameseText)
+            //}
+            val displayList = rememberSaveable { listOf(englishText, vietnameseText) }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                items(displayList) { text ->
+                items(displayList, /*key = { it }*/) { text ->
                     val fileLoadState =
-                    produceState<FileLoadforWord?>(initialValue = null, key1 = text)
-                    { value = getAudioFileForText(text) }
+                    produceState<FileLoadforWord?>(initialValue = null, /*key1 = text*/)
+                    { value = loadAudioFileFromDiskForText(appContext, text) }
                     //produceState uses remember internally, so will rerun when config changes
                     val fileLoad = fileLoadState.value
                     if (fileLoad != null) {
                         val audioFile = fileLoad.file
-                        if (fileLoad.exists) {
-                            WordAudioRow(
-                                word = text,
+                        var existencePositive by rememberSaveable { mutableStateOf(fileLoad.checkExisted) }
+                        if (existencePositive) {
+                            WordAudioDisplay(
+                                word = fileLoad.fileName,
                                 onDeleteAudio = { audioWordName ->
                                     scope.launch {
                                         val info = withContext(Dispatchers.IO) {
                                             val deleted = audioFile.delete()
                                             if (deleted) {
+                                                existencePositive = false
                                                 return@withContext "Deleted audio file for \"$audioWordName\""
                                             } else {
                                                 return@withContext "Failed to delete audio file for \"$audioWordName\""
@@ -173,9 +182,36 @@ fun CardDetailScreen(
                                         }
                                         onMessageChange(info)
                                     }
+                                },
+                                onPlayAudio = { //wordToPlay ->
+                                    if (player == null) { player = instantiatePlayer(
+                                        appContext = appContext,
+                                        onMessageChange = onMessageChange
+                                    )}
+                                    val mediaItem = MediaItem.fromUri(audioFile.absolutePath.toUri())
+                                    player!!.setMediaItem(mediaItem)
+                                    player!!.prepare()
+                                    player!!.play()
                                 }
                             )
-                        } else { Text("No audio for \"$text\"") }
+                        } else {
+                            Button(
+                                onClick = {
+                                    scope.launch {
+                                        val info = downloadAudioForWord(
+                                            appContext = appContext,
+                                            networkService = networkService,
+                                            text = text
+                                        )
+                                        if (info.status == "SUCCESS") {
+                                            existencePositive = true
+                                        } else {
+                                            onMessageChange((info as AudioLoadResult.Error).message)
+                                        }
+                                    }
+                                }
+                            ) { Text("Download audio for \"$text\"") }
+                        }
                     } else { Text("Checking...") }
                 }
             }
@@ -184,26 +220,27 @@ fun CardDetailScreen(
 }
 
 @Composable
-fun WordAudioRow(
+fun WordAudioDisplay(
     word: String,
-    onDeleteAudio: (String) -> Unit
+    onDeleteAudio: (String) -> Unit,
+    onPlayAudio: (String) -> Unit
 ) {
-    Row(
+    Column(
         modifier = Modifier.fillMaxWidth().padding(3.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        horizontalAlignment = Alignment.Start
     ) {
-        Text(
-            text = word,
-            modifier = Modifier.weight(1f)
-        )
-
-        Button(onClick = { onDeleteAudio(word) }) {
-            Text("Delete Audio")
+        Text(text = word)
+        Row(
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(onClick = { onDeleteAudio(word) }) {
+                Text("Delete Audio")
+            }
+            Spacer(Modifier.width(4.dp))
+            Button(onClick = { onPlayAudio(word) }) {
+                Text("Play Audio")
+            }
         }
     }
 }
-
-data class FileLoadforWord(
-    val file: File,
-    val exists: Boolean
-)

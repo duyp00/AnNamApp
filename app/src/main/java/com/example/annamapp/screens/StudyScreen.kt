@@ -1,5 +1,6 @@
 package com.example.annamapp.screens
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -66,32 +67,6 @@ fun StudyScreen(
     var playerState by rememberSaveable { mutableStateOf(0) }
     //move player out of onClick so it is not re-created on every click
     var player by retain { mutableStateOf<ExoPlayer?>(null) }
-    fun instantiatePlayer(): ExoPlayer {
-        return ExoPlayer.Builder(appContext).build().apply {//for retain(), use app context instead of
-            addListener(object: Player.Listener { //activity context to avoid memory leaks
-                override fun onPlaybackStateChanged(playbackState: Int) {
-                    when (playbackState) {
-                        Player.STATE_BUFFERING -> {
-                            onMessageChange("Buffering...")
-                            playerState = 2
-                        }
-                        Player.STATE_READY -> { // Player is prepared and ready to play
-                            onMessageChange("Ready")
-                            playerState = 3
-                        }
-                        Player.STATE_ENDED -> {
-                            onMessageChange("Finished")
-                            playerState = 4
-                        }
-                        Player.STATE_IDLE -> Unit // Player is idle, e.g., after release or error
-                    }
-                }
-                override fun onIsPlayingChanged(isPlaying: Boolean) {
-                    isPlayerPlaying = isPlaying
-                }
-            })
-        }
-    }
     RetainedEffect(Unit) {
         onRetire {
             if (player != null) {
@@ -201,43 +176,29 @@ fun StudyScreen(
                                 player!!.pause()
                             } else {
                                 if (playNew) {
-                                    val filename = withContext(Dispatchers.Default) {
-                                        sha256ofString(displayText)
-                                    }
-                                    val result = withContext(Dispatchers.IO) {
-                                        //directory or file path, treated as a file in Linux
-                                        val dir = appContext.filesDir
-                                        val file = File(dir, filename)
-                                        if (!file.exists()) {
-                                            val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
-                                            val preferences: Preferences = preferencesFlow.first()
-                                            val response = networkService.fetchAudio(
-                                                cardWithCredential = AudioRequestJSON(
-                                                    word = displayText,
-                                                    email = preferences[EMAIL] ?: return@withContext
-                                                    AudioLoadResult.Error("Email not found"),
-                                                    token = preferences[TOKEN] ?: return@withContext
-                                                    AudioLoadResult.Error("Token not found")
-                                                )
-                                            )
-                                            if (response.code != 200) {
-                                                //should not call onMessageChange from non-UI thread
-                                                return@withContext AudioLoadResult.Error(
-                                                    "Response code is ${response.code}"
-                                                )
-                                            }
-                                            val bytes = Base64.decode(response.message)
-                                            saveAudioToInternalStorage(file, bytes)
+                                    val fileLoad = loadAudioFileFromDiskForText(
+                                        appContext = appContext,
+                                        text = displayText
+                                    )
+                                    if (!fileLoad.checkExisted) {
+                                        val result = downloadAudioForWord(
+                                            appContext = appContext,
+                                            text = displayText,
+                                            networkService = networkService
+                                        )
+                                        if (result.status == "ERROR") {
+                                            onMessageChange((result as AudioLoadResult.Error).message)
+                                            return@launch
                                         }
-                                        val mediaitem = MediaItem.fromUri(file.absolutePath.toUri())
-                                        AudioLoadResult.Success(mediaItem = mediaitem)//implicit return
                                     }
-                                    if (result.status == "ERROR") {
-                                        onMessageChange((result as AudioLoadResult.Error).message)
-                                        return@launch
-                                    }
-                                    val mediaItem = (result as AudioLoadResult.Success).mediaItem
-                                    if (player == null) { player = instantiatePlayer() }
+                                    val file = fileLoad.file
+                                    val mediaItem = MediaItem.fromUri(file.absolutePath.toUri())
+                                    if (player == null) { player = instantiatePlayer(
+                                        appContext = appContext,
+                                        onMessageChange = onMessageChange,
+                                        onPlayerStateChange = { state -> playerState = state },
+                                        onPlayingChange = { playing -> isPlayerPlaying = playing }
+                                    )}
                                     player!!.setMediaItem(mediaItem)
                                     player!!.prepare()
                                     playNew = false
@@ -261,8 +222,85 @@ fun StudyScreen(
     }
 }
 
-sealed class AudioLoadResult {
-    data class Success(val mediaItem: MediaItem): AudioLoadResult()
+fun instantiatePlayer(
+    appContext: Context,
+    onMessageChange: (String) -> Unit = {},
+    onPlayerStateChange: (Int) -> Unit = {},
+    onPlayingChange: (Boolean) -> Unit = {}
+): ExoPlayer {
+    return ExoPlayer.Builder(appContext).build().apply {
+        addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                onPlayerStateChange(playbackState)
+                when (playbackState) {
+                    Player.STATE_BUFFERING -> onMessageChange("Buffering...") //num = 2
+                    Player.STATE_READY -> onMessageChange("Ready") //num = 3. prepared and ready to play
+                    Player.STATE_ENDED -> onMessageChange("Finished") //num = 4
+                    Player.STATE_IDLE -> Unit //num = 1. idle, e.g., after release or error
+                }
+            }
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                onPlayingChange(isPlaying)
+            }
+        })
+    }
+}
+
+suspend fun loadAudioFileFromDiskForText(appContext : Context, text: String): FileLoadforWord {
+    val filename = withContext(Dispatchers.Default) {
+        sha256ofString(text)
+    }
+    return withContext(Dispatchers.IO) {
+        //directory or file path, treated as a file in Linux
+        val dir = appContext.filesDir
+        val audioFile = File(dir, filename)
+        FileLoadforWord(
+            file = audioFile,
+            fileName = filename,
+            checkExisted = audioFile.exists()
+        )
+    }
+}
+
+suspend fun downloadAudioForWord(
+    appContext: Context,
+    text: String,
+    networkService: NetworkService
+): AudioLoadResult {
+    try {
+        val filename = withContext(Dispatchers.Default) {
+            sha256ofString(text)
+        }
+        return withContext(Dispatchers.IO) {
+            val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
+            val preferences: Preferences = preferencesFlow.first()
+            val response = networkService.fetchAudio(
+                cardWithCredential = AudioRequestJSON(
+                    word = text,
+                    email = preferences[EMAIL] ?: return@withContext
+                    AudioLoadResult.Error("Email not found"),
+                    token = preferences[TOKEN] ?: return@withContext
+                    AudioLoadResult.Error("Token not found")
+                )
+            )
+            if (response.code != 200) {
+                return@withContext AudioLoadResult.Error(
+                    "Response code is ${response.code}"
+                )
+            }
+            val file = File(appContext.filesDir, filename)
+            val bytes = Base64.decode(response.message)
+            saveAudioToInternalStorage(file, bytes)
+            AudioLoadResult.Success("Good to go")//implicit return
+        }
+    }
+    catch (e: Exception) {
+        return AudioLoadResult.Error("Download failed: $e")
+    }
+}
+
+sealed class AudioLoadResult { //overkill but useful if more data to return
+    data class Success(val message: String): AudioLoadResult()
     data class Error(val message: String): AudioLoadResult()
     val status: String
         get() = when (this) {
@@ -271,6 +309,12 @@ sealed class AudioLoadResult {
             else -> "ERROR"
         }
 }
+
+data class FileLoadforWord(
+    val file: File,
+    val fileName: String,
+    val checkExisted: Boolean = false
+)
 
 fun saveAudioToInternalStorage(file: File, audioData: ByteArray) {
     FileOutputStream(file).use { fos ->

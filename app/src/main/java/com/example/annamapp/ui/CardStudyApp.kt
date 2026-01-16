@@ -71,7 +71,7 @@ fun CardStudyApp(
                 if (showBack) {
                     TextButton(
                         content = { Text(stringResource(R.string.back_button_label)) },
-                        onClick = { navController.navigateUp() },
+                        onClick = { navController.navigateUp() }, //or popBackStack(), but if click too fast it pop the NavHost
                         modifier = Modifier.semantics { contentDescription = "navigateBack" },
                         border = BorderStroke(width = 1.dp, color = Color.Gray),
                         //colors = androidx.compose.material3.ButtonDefaults.buttonColors(
@@ -129,7 +129,6 @@ fun CardStudyApp(
 }
 
 fun titleForRoute(route: String?): String {
-    // Compare the route string against the qualified name of each route class
     return when {
         route == Routes.Home::class.qualifiedName -> "Home"
         route == Routes.Study::class.qualifiedName -> "Study Cards"
@@ -138,11 +137,12 @@ fun titleForRoute(route: String?): String {
         route == Routes.LogIn::class.qualifiedName -> "Log In"
         route == Routes.TokenScreen::class.qualifiedName -> "Enter Received Token"
 
-        // For routes with arguments (like CardDetail), the route string will be
-        // "com.example...Routes.CardDetail/{cardId}"
-        // So we check if the string *starts with* the class name.
-        route?.startsWith(Routes.SearchResults::class.qualifiedName!!) == true -> "Search Results"
-        route?.startsWith(Routes.CardDetail::class.qualifiedName!!) == true -> "Card Details"
+        //for routes with arguments (like CardDetail), the route string will be
+        //"com.example...Routes.CardDetail/{cardId}"
+        //so check if the string *starts with* the class name.
+        //non-null assert is used because it's always not null in this case
+        route?.startsWith(Routes.SearchResults::class.qualifiedName!!) ?: false -> "Search Results"
+        route?.startsWith(Routes.CardDetail::class.qualifiedName!!) ?: false -> "Card Details"
 
         else -> "New screen"
     }

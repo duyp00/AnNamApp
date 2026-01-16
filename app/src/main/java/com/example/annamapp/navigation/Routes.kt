@@ -9,19 +9,19 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface Routes {
     @Serializable
-    data object Home
+    data object Home: Routes
 
     @Serializable
-    data object Study
+    data object Study: Routes
 
     @Serializable
-    data object Add
+    data object Add: Routes
 
     @Serializable
-    data object Search
+    data object Search: Routes
 
     @Serializable
-    data object LogIn
+    data object LogIn: Routes
 
     @Serializable
     data class SearchResults(
@@ -31,16 +31,12 @@ sealed interface Routes {
         val vietnameseQuery: String,
         val vietnameseEnabled: Boolean,
         val vietnameseWholeWord: Boolean
-    )
+    ): Routes
 
-    /**
-     * Card Detail screen.
-     * @param cardId The unique ID of the card to display.
-     * This is a 'data class' because it carries data.
-     */
+    //This is a data class because it carries data.
     @Serializable
-    data class CardDetail(val cardId: Int)
+    data class CardDetail(val en: String, val vn: String): Routes
 
     @Serializable
-    data class TokenScreen(val email: String)
+    data class TokenScreen(val email: String): Routes
 }

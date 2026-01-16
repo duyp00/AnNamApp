@@ -35,9 +35,9 @@ fun AppNavHost(
     val updateFlashCard: suspend (FlashCard) -> Unit = {
         flashCardDao.updateCard(it)
     }
-    val getCardById: suspend (Int) -> FlashCard? = {
-        flashCardDao.getCardById(it)
-    }
+    //val getCardById: suspend (Int) -> FlashCard? = {
+    //    flashCardDao.getCardById(it)
+    //}
     val deleteCard: suspend (FlashCard) -> Unit = {
         flashCardDao.delete(it)
     }
@@ -107,7 +107,7 @@ fun AppNavHost(
                 deleteCards = { deletelist ->
                     deletelist.forEach { card -> deleteCard(card) }
                 },
-                onNavigateToCard = { cardId -> navCtrller.navigate(Routes.CardDetail(cardId)) },
+                onNavigateToCard = { en, vn -> navCtrller.navigate(Routes.CardDetail(en, vn)) },
                 onMessageChange = onMessageChange
             )
         }
@@ -116,14 +116,15 @@ fun AppNavHost(
         composable<Routes.CardDetail> { backStackEntry ->
             // Retrieve the type-safe arguments object
             val args = backStackEntry.toRoute<Routes.CardDetail>()
-
             CardDetailScreen(
-                getCardById = getCardById,
+                enWord = args.en,
+                vnWord = args.vn,
                 updateCard = updateFlashCard,
-                //deleteCard = deleteCard,
-                cardId = args.cardId, // Access arguments directly
-                //onNavigateBack = { navCtrller.popBackStack() },
-                onMessageChange = onMessageChange
+                onNavigateBack = { navCtrller.popBackStack() },
+                onMessageChange = onMessageChange,
+                findByWord = findByWord,
+                networkService = networkService,
+                /*getCardById = getCardById,*/ /*deleteCard = deleteCard,*/ /*cardId = args.cardId,*/
             )
         }
 

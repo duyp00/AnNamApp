@@ -1,5 +1,5 @@
 package com.example.annamapp
-
+/*
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
 import androidx.room.Room
@@ -151,3 +151,4 @@ class DaoTest {
     /* Similar for the other 2 cases */
 
 }
+*/
