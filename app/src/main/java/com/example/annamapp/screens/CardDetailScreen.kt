@@ -61,7 +61,7 @@ fun CardDetailScreen(
     RetainedEffect(Unit) {
         onRetire {
             if (player != null) {
-                player!!.release()
+                player?.release()
                 player = null
                 onMessageChange("Player released")
             }
@@ -189,9 +189,9 @@ fun CardDetailScreen(
                                         onMessageChange = onMessageChange
                                     )}
                                     val mediaItem = MediaItem.fromUri(audioFile.absolutePath.toUri())
-                                    player!!.setMediaItem(mediaItem)
-                                    player!!.prepare()
-                                    player!!.play()
+                                    player?.setMediaItem(mediaItem)
+                                    player?.prepare()
+                                    player?.play()
                                 }
                             )
                         } else {

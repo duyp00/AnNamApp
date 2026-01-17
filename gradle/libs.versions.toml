@@ -1,8 +1,8 @@
 [versions]
 
-agp = "8.13.2"
+agp = "9.0.0"
 
-composeVersion = "1.10.0"
+composeVersion = "1.10.1"
 
 converterGson = "3.0.0"
 datastorePreferences = "1.2.0"
@@ -23,7 +23,7 @@ lifecycleRuntimeKtx = "2.10.0"
 
 activityCompose = "1.12.2"
 
-composeBom = "2025.12.01"
+composeBom = "2026.01.00"
 
 navigationCompose = "2.9.6"
 
@@ -40,7 +40,7 @@ roomVersion = "2.8.4"
 
 coreKtxVersion = "1.7.0"
 
-ui = "1.10.0"
+ui = "1.10.1"
 #uiToolingPreview = "1.10.0"
 #uiTooling = "1.10.0"
 

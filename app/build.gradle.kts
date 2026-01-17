@@ -8,6 +8,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        create("release") {
+            storeFile = file(property("RELEASE_STORE_FILE") as String)
+            storePassword = property("RELEASE_STORE_PASSWORD") as String
+            keyAlias = property("RELEASE_KEY_ALIAS") as String
+            keyPassword = property("RELEASE_KEY_PASSWORD") as String
+        }
+    }
     namespace = "com.example.annamapp"
     compileSdk = 36
 
@@ -37,6 +45,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
             //signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -63,6 +72,10 @@ android {
 
         }
 
+    }
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
 }
 

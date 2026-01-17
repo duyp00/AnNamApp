@@ -70,7 +70,7 @@ fun StudyScreen(
     RetainedEffect(Unit) {
         onRetire {
             if (player != null) {
-                player!!.release()
+                player?.release()
                 player = null
                 onMessageChange("Player released")
             }
@@ -171,9 +171,9 @@ fun StudyScreen(
             Button(
                 onClick = {
                     scope.launch {
-                        try { //non-null asserted is used since player is instantiated before use
+                        try {
                             if (isPlayerPlaying) {
-                                player!!.pause()
+                                player?.pause()
                             } else {
                                 if (playNew) {
                                     val fileLoad = loadAudioFileFromDiskForText(
@@ -199,14 +199,14 @@ fun StudyScreen(
                                         onPlayerStateChange = { state -> playerState = state },
                                         onPlayingChange = { playing -> isPlayerPlaying = playing }
                                     )}
-                                    player!!.setMediaItem(mediaItem)
-                                    player!!.prepare()
+                                    player?.setMediaItem(mediaItem)
+                                    player?.prepare()
                                     playNew = false
                                 } else if (playerState == 4) {
                                     //no need to set media again. go to start of audio
-                                    player!!.seekTo(0)
+                                    player?.seekTo(0)
                                 }
-                                player!!.play()
+                                player?.play()
                             }
                         } catch (e: Exception) {
                             onMessageChange("$e")

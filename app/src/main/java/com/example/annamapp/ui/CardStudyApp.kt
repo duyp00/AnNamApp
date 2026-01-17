@@ -55,7 +55,7 @@ fun CardStudyApp(
     // 2. Get the qualified name of the home route.
     // e.g., "com.example.annamapp.navigation.Routes.Home"
     val homeRouteString = Routes.Home::class.qualifiedName
-    // 3. Get the current route as a STRING. Default to home.
+    // 3. Get the current route as a STRING.
     val currentRouteString = navBackStackEntry?.destination?.route
 
     var message by rememberSaveable { mutableStateOf("") }
