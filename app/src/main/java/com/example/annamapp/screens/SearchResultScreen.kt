@@ -41,7 +41,7 @@ fun SearchResultScreen(
 
     suspend fun refresh() {
         results = performSearch(filters)
-        //selectedCardIds = setOf() //clear selection on refresh
+        //selectedCardIds = setOf() //not here otherwise navigating back would clear selection
         if (results.isEmpty()) {
             onMessageChange("No cards found")
         } else {
@@ -81,6 +81,7 @@ fun SearchResultScreen(
                         deleteCards(toDelete)
                         onMessageChange("Deleted ${toDelete.size} card(s)")
                         refresh()
+                        selectedCardIds = setOf() //clear selection after deletion
                     }
                 }
             ) {
