@@ -6,9 +6,14 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+//import androidx.room.RawQuery
+//import androidx.sqlite.db.SupportSQLiteQuery
 
 @Dao
 interface FlashCardDao {
+    //@RawQuery
+    //fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
+
     @Query("SELECT * FROM FlashCards")
     suspend fun getAll(): List<FlashCard>
 
@@ -17,6 +22,20 @@ interface FlashCardDao {
 
     //@Query("SELECT * FROM FlashCards WHERE uid = :uid LIMIT 1")
     //suspend fun getCardById(uid: Int): FlashCard?
+
+    /*@Query(
+        "UPDATE FlashCards SET english_card = :englishNew, vietnamese_card = :vietnameseNew " +
+                "WHERE english_card = :englishOld AND vietnamese_card = :vietnameseOld"
+    )
+    suspend fun updateFlashCard(
+        englishOld: String, vietnameseOld: String,
+        englishNew: String, vietnameseNew: String
+    )
+
+    @Query(
+        "DELETE FROM FlashCards WHERE english_card = :english " +
+                "AND vietnamese_card = :vietnamese "
+    ) suspend fun deleteFlashCard(english: String, vietnamese: String)*/
 
     @Query("SELECT * FROM FlashCards WHERE english_card LIKE :english AND " +/*'+' here is concatenation, nothing to do with sql*/
             "vietnamese_card LIKE :vietnamese LIMIT 1")
@@ -52,6 +71,7 @@ interface FlashCardDao {
     @Update(entity = FlashCard::class, onConflict = OnConflictStrategy.IGNORE)
     suspend fun updateCard(flashCard: FlashCard)
 
+    //@Query("SELECT * FROM FlashCards LIMIT :size")
     @Query("SELECT * FROM FlashCards ORDER BY RANDOM() LIMIT :size")
     suspend fun getLesson(size: Int): List<FlashCard>
 }

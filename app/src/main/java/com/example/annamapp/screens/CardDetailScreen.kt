@@ -184,14 +184,16 @@ fun CardDetailScreen(
                                     }
                                 },
                                 onPlayAudio = { //wordToPlay ->
-                                    if (player == null) { player = instantiatePlayer(
-                                        appContext = appContext,
-                                        onMessageChange = onMessageChange
-                                    )}
-                                    val mediaItem = MediaItem.fromUri(audioFile.absolutePath.toUri())
-                                    player?.setMediaItem(mediaItem)
-                                    player?.prepare()
-                                    player?.play()
+                                    scope.launch {
+                                        if (player == null) { player = instantiatePlayer(
+                                            appContext = appContext,
+                                            onMessageChange = onMessageChange
+                                        )}
+                                        val mediaItem = MediaItem.fromUri(audioFile.absolutePath.toUri())
+                                        player?.setMediaItem(mediaItem)
+                                        player?.prepare()
+                                        player?.play()
+                                    }
                                 }
                             )
                         } else {

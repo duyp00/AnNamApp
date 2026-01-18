@@ -52,8 +52,7 @@ fun SearchResultScreen(
     LaunchedEffect(Unit) {
         //key1 = filters would also work, but filters only change when navigating to this screen
         if (!hasLoaded) { //if want to see changes after updating cards, disable this guard,
-            //but huge performance drop if DB is large just to navigate back
-            refresh()
+            refresh()     //but huge performance drop if DB is large just to navigate back
             hasLoaded = true
         }
     }
