@@ -41,7 +41,7 @@ import kotlinx.coroutines.withContext
 fun CardDetailScreen(
     enWord: String,
     vnWord: String,
-    updateCard: suspend (FlashCard) -> Unit,
+    updateCard: suspend (FlashCard, String, String, String, String) -> Unit,
     onNavigateBack: () -> Unit,
     onMessageChange: (String) -> Unit,
     findByWord: suspend (String, String) -> FlashCard?,
@@ -57,6 +57,8 @@ fun CardDetailScreen(
     val appContext = LocalContext.current.applicationContext
     //move player out of onClick so it is not re-created on every click
     var player by retain { mutableStateOf<ExoPlayer?>(null) }
+    val enInitial = rememberSaveable { enWord }
+    val vnInitial = rememberSaveable { vnWord }
 
     RetainedEffect(Unit) {
         onRetire {
@@ -141,7 +143,10 @@ fun CardDetailScreen(
                             englishCard = englishText,
                             vietnameseCard = vietnameseText
                         ) ?: return@launch
-                        updateCard(updatedCard)
+                        updateCard(updatedCard, enInitial, vnInitial, englishText, vietnameseText)
+                        //set initials to current after update. use mutableStateOf to be observable
+                        //enInitial = englishText
+                        //vnInitial = vietnameseText
                         //onMessageChange("Card updated") //disabled because navigating back
                         onNavigateBack()                  //immediately overrides message
                     }

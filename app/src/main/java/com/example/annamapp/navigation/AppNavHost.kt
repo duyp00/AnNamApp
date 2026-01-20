@@ -2,6 +2,7 @@ package com.example.annamapp.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,7 +18,10 @@ import com.example.annamapp.screens.SearchResultScreen
 import com.example.annamapp.screens.SearchScreen
 import com.example.annamapp.screens.StudyScreen
 import com.example.annamapp.screens.TokenScreen
+import com.example.annamapp.screens.loadAudioFileFromDiskForText
 import com.example.annamapp.ui.NetworkService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 //import com.example.annamapp.navigation.Routes.*
 
 @Composable
@@ -28,12 +32,28 @@ fun AppNavHost(
     onMessageChange: (String) -> Unit = {},
     networkService: NetworkService
 ) {
+    val appContext = LocalContext.current.applicationContext
     // Define lambda notions for database operations
     val insertFlashCard: suspend (FlashCard) -> Unit = {
         flashCardDao.insertAll(it)
     }
-    val updateFlashCard: suspend (FlashCard) -> Unit = {
-        flashCardDao.updateCard(it)
+    val updateFlashCard: suspend (FlashCard, String, String, String, String) -> Unit = {
+        flashcard, enInitial, vnInitial, enUpdated, vnUpdated ->
+        flashCardDao.updateCard(flashcard)
+        if (enInitial != enUpdated) {
+            val oldAudioFile = loadAudioFileFromDiskForText(
+                appContext = appContext,
+                text = enInitial
+            ).file
+            withContext(Dispatchers.IO) { oldAudioFile.delete() }
+        }
+        if (vnInitial != vnUpdated) {
+            val oldAudioFile = loadAudioFileFromDiskForText(
+                appContext = appContext,
+                text = vnInitial
+            ).file
+            withContext(Dispatchers.IO) { oldAudioFile.delete() }
+        }
     }
     //val getCardById: suspend (Int) -> FlashCard? = {
     //    flashCardDao.getCardById(it)
@@ -105,7 +125,21 @@ fun AppNavHost(
                 filters = args,
                 performSearch = searchFlashCards,
                 deleteCards = { deletelist ->
-                    deletelist.forEach { card -> deleteCard(card) }
+                    deletelist.forEach { card ->
+                        val enFile = loadAudioFileFromDiskForText(
+                            appContext = appContext,
+                            text = card.englishCard.orEmpty()
+                        ).file
+                        val viFile = loadAudioFileFromDiskForText(
+                            appContext = appContext,
+                            text = card.vietnameseCard.orEmpty()
+                        ).file
+                        withContext(Dispatchers.IO) {
+                            enFile.delete()
+                            viFile.delete()
+                        }
+                        deleteCard(card)
+                    }
                 },
                 onNavigateToCard = { en, vn -> navCtrller.navigate(Routes.CardDetail(en, vn)) },
                 onMessageChange = onMessageChange
