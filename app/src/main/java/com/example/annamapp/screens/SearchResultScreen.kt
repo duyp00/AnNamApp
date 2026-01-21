@@ -92,7 +92,7 @@ fun SearchResultScreen(
             Text(text = "No cards to show", modifier = Modifier.padding(top = 24.dp))
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                items(results, /*key = { it.uid }*/) { card ->
+                items(results, key = {card -> card.uid}) { card ->
                     ResultRow(
                         card = card,
                         isSelected = selectedCardIds.contains(card.uid),

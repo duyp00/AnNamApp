@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -162,7 +162,7 @@ fun CardDetailScreen(
             //}
             val displayList = rememberSaveable { listOf(englishText, vietnameseText) }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                items(displayList, /*key = { it }*/) { text ->
+                itemsIndexed(displayList) { index, text ->
                     val fileLoadState =
                     produceState<FileLoadforWord?>(initialValue = null, /*key1 = text*/)
                     { value = loadAudioFileFromDiskForText(appContext, text) }
@@ -174,15 +174,15 @@ fun CardDetailScreen(
                         if (existencePositive) {
                             WordAudioDisplay(
                                 word = fileLoad.fileName,
-                                onDeleteAudio = { audioWordName ->
+                                onDeleteAudio = { //audioWordName ->
                                     scope.launch {
                                         val info = withContext(Dispatchers.IO) {
                                             val deleted = audioFile.delete()
                                             if (deleted) {
                                                 existencePositive = false
-                                                return@withContext "Deleted audio file for \"$audioWordName\""
+                                                return@withContext "Deleted audio file for \"$text\""
                                             } else {
-                                                return@withContext "Failed to delete audio file for \"$audioWordName\""
+                                                return@withContext "Failed to delete audio file for \"$text\""
                                             }
                                         }
                                         onMessageChange(info)
@@ -204,11 +204,28 @@ fun CardDetailScreen(
                         } else {
                             Button(
                                 onClick = {
+                                    var downloadText = ""
+                                    when(index) {
+                                        0 -> {
+                                            if (enInitial != englishText) {
+                                                onMessageChange("Please save \"$text\" to database before downloading")
+                                                return@Button
+                                            }
+                                            downloadText = enInitial
+                                        }
+                                        1 -> {
+                                            if (vnInitial != vietnameseText) {
+                                                onMessageChange("Please save \"$text\" to database before downloading")
+                                                return@Button
+                                            }
+                                            downloadText = vnInitial
+                                        }
+                                    }
                                     scope.launch {
                                         val info = downloadAudioForWord(
                                             appContext = appContext,
                                             networkService = networkService,
-                                            text = text
+                                            text = downloadText
                                         )
                                         if (info.status == "SUCCESS") {
                                             existencePositive = true
