@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
             .build()
         
         val retrofit: Retrofit = Retrofit.Builder()
-            .baseUrl("https://placeholder.com")
+            .baseUrl("https://127.0.0.1/")
             .client(sharedOkHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

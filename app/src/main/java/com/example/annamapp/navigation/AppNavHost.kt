@@ -17,7 +17,6 @@ import com.example.annamapp.screens.LogInScreen
 import com.example.annamapp.screens.SearchResultScreen
 import com.example.annamapp.screens.SearchScreen
 import com.example.annamapp.screens.StudyScreen
-import com.example.annamapp.screens.TokenScreen
 import com.example.annamapp.screens.loadAudioFileFromDiskForText
 import com.example.annamapp.ui.NetworkService
 import kotlinx.coroutines.Dispatchers
@@ -37,17 +36,17 @@ fun AppNavHost(
     val insertFlashCard: suspend (FlashCard) -> Unit = {
         flashCardDao.insertAll(it)
     }
-    val updateFlashCard: suspend (FlashCard, String, String, String, String) -> Unit = {
-        flashcard, enInitial, vnInitial, enUpdated, vnUpdated ->
+    val updateFlashCard: suspend (FlashCard, String, String) -> Unit = {
+        flashcard, enInitial, vnInitial ->
         flashCardDao.updateCard(flashcard)
-        if (enInitial != enUpdated) {
+        if (enInitial != flashcard.englishCard) {
             val oldAudioFile = loadAudioFileFromDiskForText(
                 appContext = appContext,
                 text = enInitial
             ).file
             withContext(Dispatchers.IO) { oldAudioFile.delete() }
         }
-        if (vnInitial != vnUpdated) {
+        if (vnInitial != flashcard.vietnameseCard) {
             val oldAudioFile = loadAudioFileFromDiskForText(
                 appContext = appContext,
                 text = vnInitial
@@ -96,11 +95,19 @@ fun AppNavHost(
         }
 
         composable<Routes.Study> {
-            StudyScreen(onMessageChange = onMessageChange, pickCardLesson = pickCardLesson, networkService = networkService)
+            StudyScreen(
+                onMessageChange = onMessageChange,
+                pickCardLesson = pickCardLesson,
+                networkService = networkService
+            )
         }
 
         composable<Routes.Add> {
-            AddCardScreen(onMessageChange = onMessageChange, insertFlashCard = insertFlashCard, findByWord = findByWord)
+            AddCardScreen(
+                onMessageChange = onMessageChange,
+                insertFlashCard = insertFlashCard,
+                findByWord = findByWord
+            )
         }
 
         composable<Routes.Search> {
@@ -112,10 +119,10 @@ fun AppNavHost(
         }
 
         composable<Routes.LogIn> {
-            LogInScreen(onMessageChange = onMessageChange, networkService = networkService,
-                onNavigateToTokenScreen = {email ->
-                    navCtrller.navigate(Routes.TokenScreen(email))
-                }
+            LogInScreen(
+                onMessageChange = onMessageChange,
+                networkService = networkService,
+                onNavigateHome = { navCtrller.navigate(Routes.Home) }
             )
         }
 
@@ -154,18 +161,11 @@ fun AppNavHost(
                 enWord = args.en,
                 vnWord = args.vn,
                 updateCard = updateFlashCard,
-                onNavigateBack = { navCtrller.popBackStack() },
                 onMessageChange = onMessageChange,
                 findByWord = findByWord,
                 networkService = networkService,
+                /*onNavigateBack = { navCtrller.popBackStack() },*/
                 /*getCardById = getCardById,*/ /*deleteCard = deleteCard,*/ /*cardId = args.cardId,*/
-            )
-        }
-
-        composable<Routes.TokenScreen> { backStackEntry ->
-            val args = backStackEntry.toRoute<Routes.TokenScreen>()
-            TokenScreen(email = args.email, onMessageChange = onMessageChange,
-                navigateToHome = {navCtrller.navigate(Routes.Home)}
             )
         }
     }

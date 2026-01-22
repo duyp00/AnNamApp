@@ -1,7 +1,9 @@
 package com.example.annamapp.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -13,8 +15,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.edit
+import com.example.annamapp.EMAIL
+import com.example.annamapp.TOKEN
+import com.example.annamapp.dataStore
 import com.example.annamapp.ui.NetworkService
 import com.example.annamapp.ui.UserCredential
 import kotlinx.coroutines.Dispatchers
@@ -25,15 +33,18 @@ import kotlinx.coroutines.withContext
 fun LogInScreen(
     onMessageChange: (String) -> Unit = {},
     networkService: NetworkService,
-    onNavigateToTokenScreen: (String) -> Unit
+    onNavigateHome: () -> Unit
 ) {
     LaunchedEffect(Unit) {
         onMessageChange("get tokens to log in")
     }
 
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val appContext = context.applicationContext
     //var token by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
+    var token by rememberSaveable { mutableStateOf("") }
 
     Column {
         /*
@@ -50,33 +61,46 @@ fun LogInScreen(
             modifier = Modifier.semantics { contentDescription = "emailfield" },
             label = { Text("email") }
         )
-
-        Button(
-            onClick = {
-                scope.launch {
-                    try {
-                        var isSuccessful = false
-                        val resMessage = withContext(Dispatchers.IO) {
-                            val result = networkService.generateToken(email = UserCredential(email))
-                            //token = result.token
-                            Log.d("FLASHCARD", result.toString())
-                            if (result.code == 200) {
-                                isSuccessful = true
-                            }
-                            result.message//implicit return for last line
-                        }
-                        onMessageChange(resMessage) //not done in IO thread but in main thread
-                        if (isSuccessful) {
-                            onNavigateToTokenScreen(email)
-                        } //else { return@launch }
-                    } catch (e: Exception) {
-                        onMessageChange("Error in the token request: $e")
-                        Log.d("FLASHCARD", "Unexpected exception: $e")
-                    }
-                }
-            },
-            modifier = Modifier.semantics { contentDescription = "Enter" }
+        TextField(
+            value = token,
+            onValueChange = { token = it },
+            modifier = Modifier.semantics { contentDescription = "tokenfield" },
+            label = { Text("token") }
         )
-        { Text("Enter") }
+        Row {
+            Button(
+                onClick = {
+                    scope.launch {
+                        try {
+                            val resMessage = withContext(Dispatchers.IO) {
+                                val result =
+                                    networkService.generateToken(email = UserCredential(email))
+                                listOf(result.code.toString(), result.message)//.joinToString(", ")
+                            }
+                            onMessageChange("Response code = ${resMessage[0]}, message = ${resMessage[1]}")
+                        } catch (e: Exception) {
+                            onMessageChange("Error in the token request: $e")
+                        }
+                    }
+                },
+                modifier = Modifier.semantics { contentDescription = "GetToken" }
+            ) { Text("Get token") }
+            Spacer(modifier = Modifier.width(5.dp))
+            Button(
+                onClick = {
+                    scope.launch {
+                        withContext(Dispatchers.IO) {
+                            appContext.dataStore.edit { preferences ->
+                                preferences[EMAIL] = email
+                                preferences[TOKEN] = token
+                            }
+                        }
+                        //onMessageChange("Logged in")
+                        onNavigateHome()
+                    }
+                },
+                modifier = Modifier.semantics { contentDescription = "LogIn" }
+            ) { Text("Log in") }
+        }
     }
 }

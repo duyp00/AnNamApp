@@ -135,7 +135,6 @@ fun titleForRoute(route: String?): String {
         route == Routes.Add::class.qualifiedName -> "Add a Card"
         route == Routes.Search::class.qualifiedName -> "Search Cards"
         route == Routes.LogIn::class.qualifiedName -> "Log In"
-        route == Routes.TokenScreen::class.qualifiedName -> "Enter Received Token"
 
         //for routes with arguments (like CardDetail), the route string will be
         //"com.example...Routes.CardDetail/{cardId}"

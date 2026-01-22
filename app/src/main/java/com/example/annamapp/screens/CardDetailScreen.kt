@@ -41,12 +41,11 @@ import kotlinx.coroutines.withContext
 fun CardDetailScreen(
     enWord: String,
     vnWord: String,
-    updateCard: suspend (FlashCard, String, String, String, String) -> Unit,
-    onNavigateBack: () -> Unit,
+    updateCard: suspend (FlashCard, String, String) -> Unit,
     onMessageChange: (String) -> Unit,
     findByWord: suspend (String, String) -> FlashCard?,
     networkService: NetworkService
-    /*deleteCard: suspend (FlashCard) -> Unit,*/
+    /*deleteCard: suspend (FlashCard) -> Unit,*/ /*onNavigateBack: () -> Unit,*/
     /*getCardById: suspend (Int) -> FlashCard?,*/ /*cardId: Int,*/
 ) {
     //var card by rememberSaveable { mutableStateOf<FlashCard?>(null) }
@@ -57,8 +56,6 @@ fun CardDetailScreen(
     val appContext = LocalContext.current.applicationContext
     //move player out of onClick so it is not re-created on every click
     var player by retain { mutableStateOf<ExoPlayer?>(null) }
-    val enInitial = rememberSaveable { enWord }
-    val vnInitial = rememberSaveable { vnWord }
 
     RetainedEffect(Unit) {
         onRetire {
@@ -88,6 +85,8 @@ fun CardDetailScreen(
         Modifier.fillMaxSize().padding(24.dp)
     ) {
         var openAudioPanel by rememberSaveable { mutableStateOf(false) }
+        var enInitial by rememberSaveable { mutableStateOf(enWord) }
+        var vnInitial by rememberSaveable { mutableStateOf(vnWord) }
         OutlinedTextField(
             value = englishText,
             onValueChange = { englishText = it },
@@ -139,16 +138,16 @@ fun CardDetailScreen(
                             englishCard = englishText,
                             vietnameseCard = vietnameseText
                         ) ?: return@launch*/
-                        val updatedCard = findByWord(enWord, vnWord)?.copy(
+                        val updatedCard = findByWord(enInitial, vnInitial)?.copy(
                             englishCard = englishText,
                             vietnameseCard = vietnameseText
                         ) ?: return@launch
-                        updateCard(updatedCard, enInitial, vnInitial, englishText, vietnameseText)
+                        updateCard(updatedCard, enInitial, vnInitial)
                         //set initials to current after update. use mutableStateOf to be observable
-                        //enInitial = englishText
-                        //vnInitial = vietnameseText
-                        //onMessageChange("Card updated") //disabled because navigating back
-                        onNavigateBack()                  //immediately overrides message
+                        enInitial = englishText
+                        vnInitial = vietnameseText
+                        onMessageChange("Card updated to \"$enInitial\" - \"$vnInitial\"")
+                        //onNavigateBack()
                     }
                 }
             ) {

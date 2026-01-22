@@ -36,7 +36,4 @@ sealed interface Routes {
     //This is a data class because it carries data.
     @Serializable
     data class CardDetail(val en: String, val vn: String): Routes
-
-    @Serializable
-    data class TokenScreen(val email: String): Routes
 }

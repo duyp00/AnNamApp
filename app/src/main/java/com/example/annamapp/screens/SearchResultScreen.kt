@@ -44,8 +44,6 @@ fun SearchResultScreen(
         //selectedCardIds = setOf() //not here otherwise navigating back would clear selection
         if (results.isEmpty()) {
             onMessageChange("No cards found")
-        } else {
-            onMessageChange("Tap a card or use Delete to remove selected")
         }
     }
 
@@ -66,7 +64,7 @@ fun SearchResultScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Results", style = MaterialTheme.typography.titleMedium)
+            Text(text = "${results.size} Cards", style = MaterialTheme.typography.titleMedium)
             Button(
                 enabled = selectedCardIds.isNotEmpty(),
                 onClick = {

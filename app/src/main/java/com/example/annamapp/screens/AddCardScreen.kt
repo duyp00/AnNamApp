@@ -26,10 +26,10 @@ fun AddCardScreen(
     findByWord: suspend (String, String) -> FlashCard?,
     onMessageChange: (String) -> Unit = {}
 ) {
+    //var clickOnAdd by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { //according to chatgpt i should use this
         onMessageChange("Add your cards now")
     }
-    //var clickOnAdd by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     var enWord by rememberSaveable { mutableStateOf("") }
     var vnWord by rememberSaveable { mutableStateOf("") }
