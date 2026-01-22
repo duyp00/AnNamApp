@@ -156,13 +156,13 @@ fun CardDetailScreen(
             }
         }
         if (openAudioPanel) {
-            //live IO file check disabled due to duplicate string case, which crashes compose
-            //val displayList = rememberSaveable(englishText, vietnameseText) {
-            //    listOf(englishText, vietnameseText)
-            //}
-            val displayList = rememberSaveable { listOf(englishText, vietnameseText) }
+            //live IO file check
+            val displayList = rememberSaveable(englishText, vietnameseText) {
+                listOf(englishText, vietnameseText)
+            }
+            //val displayList = rememberSaveable { listOf(englishText, vietnameseText) }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                itemsIndexed(displayList) { index, text ->
+                itemsIndexed(displayList, key = {index, str -> "$str-$index"}) { index, text ->
                     val fileLoadState =
                     produceState<FileLoadforWord?>(initialValue = null, /*key1 = text*/)
                     { value = loadAudioFileFromDiskForText(appContext, text) }
@@ -204,28 +204,28 @@ fun CardDetailScreen(
                         } else {
                             Button(
                                 onClick = {
-                                    var downloadText = ""
+                                    //var downloadText = ""
                                     when(index) {
                                         0 -> {
                                             if (enInitial != englishText) {
                                                 onMessageChange("Please save \"$text\" to database before downloading")
                                                 return@Button
                                             }
-                                            downloadText = enInitial
+                                            //downloadText = enInitial
                                         }
                                         1 -> {
                                             if (vnInitial != vietnameseText) {
                                                 onMessageChange("Please save \"$text\" to database before downloading")
                                                 return@Button
                                             }
-                                            downloadText = vnInitial
+                                            //downloadText = vnInitial
                                         }
                                     }
                                     scope.launch {
                                         val info = downloadAudioForWord(
                                             appContext = appContext,
                                             networkService = networkService,
-                                            text = downloadText
+                                            text = text //=downloadText
                                         )
                                         if (info.status == "SUCCESS") {
                                             existencePositive = true
