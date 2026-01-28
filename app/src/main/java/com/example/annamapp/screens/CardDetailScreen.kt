@@ -157,14 +157,18 @@ fun CardDetailScreen(
         if (openAudioPanel) {
             //live IO file check
             val displayList = rememberSaveable(englishText, vietnameseText) {
-                listOf(englishText, vietnameseText)
+                listOf(englishText to "en", vietnameseText to "vi")
             }
             //val displayList = rememberSaveable { listOf(englishText, vietnameseText) }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                itemsIndexed(displayList, key = {index, str -> "$str-$index"}) { index, text ->
+                itemsIndexed(displayList, key = {index, pair -> "${pair.first}-$index"}) { index, (text, language) ->
                     val fileLoadState =
                     produceState<FileLoadforWord?>(initialValue = null, /*key1 = text*/)
-                    { value = loadAudioFileFromDiskForText(appContext, text) }
+                        {value = loadAudioFileFromDiskForText(
+                            appContext = appContext,
+                            text = text,
+                            language = language
+                        )}
                     //produceState uses remember internally, so will rerun when config changes
                     val fileLoad = fileLoadState.value
                     if (fileLoad != null) {
@@ -224,7 +228,8 @@ fun CardDetailScreen(
                                         val info = downloadAudioForWord(
                                             appContext = appContext,
                                             networkService = networkService,
-                                            text = text //=downloadText
+                                            text = text, //=downloadText
+                                            language = language
                                         )
                                         if (info.status == "SUCCESS") {
                                             existencePositive = true

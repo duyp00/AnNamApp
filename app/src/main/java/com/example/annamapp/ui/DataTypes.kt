@@ -2,14 +2,14 @@ package com.example.annamapp.ui
 
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class UserCredential (val email: String)
+//@Serializable
+//data class UserEmail(val email: String)
 
 //@Serializable
-//data class UserToken (val token: String)
+//data class UserToken(val token: String)
 
-@Serializable
-data class AudioRequestJSON(val word: String, val email: String, val token: String)
+//@Serializable
+//data class AudioRequestJSON(val word: String, val email: String, val token: String)
 
 @Serializable
 data class ResponseJSON(val code: Int, val message: String)

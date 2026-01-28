@@ -18,7 +18,7 @@ junit = "4.13.2"
 #espressoCore = "3.7.0"
 
 #kotlinxCoroutinesCore = "1.10.2"
-kotlinxSerializationJson = "1.9.0"
+kotlinxSerializationJson = "1.10.0"
 lifecycleRuntimeKtx = "2.10.0"
 
 activityCompose = "1.12.2"
@@ -34,7 +34,7 @@ navigationRuntimeKtx = "2.9.6"
 navigationTesting = "2.9.6"
 
 retrofit = "3.0.0"
-robolectric = "4.16"
+robolectric = "4.16.1"
 
 roomVersion = "2.8.4"
 
@@ -44,7 +44,7 @@ ui = "1.10.1"
 #uiToolingPreview = "1.10.0"
 #uiTooling = "1.10.0"
 
-media3Exoplayer = "1.9.0"
+media3Exoplayer = "1.9.1"
 
 
 [libraries]

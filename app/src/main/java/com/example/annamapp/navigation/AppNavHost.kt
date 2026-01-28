@@ -37,19 +37,21 @@ fun AppNavHost(
         flashCardDao.insertAll(it)
     }
     val updateFlashCard: suspend (FlashCard, String, String) -> Unit = {
-        flashcard, enInitial, vnInitial ->
+    flashcard, enInitial, vnInitial ->
         flashCardDao.updateCard(flashcard)
         if (enInitial != flashcard.englishCard) {
             val oldAudioFile = loadAudioFileFromDiskForText(
                 appContext = appContext,
-                text = enInitial
+                text = enInitial,
+                language = "en"
             ).file
             withContext(Dispatchers.IO) { oldAudioFile.delete() }
         }
         if (vnInitial != flashcard.vietnameseCard) {
             val oldAudioFile = loadAudioFileFromDiskForText(
                 appContext = appContext,
-                text = vnInitial
+                text = vnInitial,
+                language = "vi"
             ).file
             withContext(Dispatchers.IO) { oldAudioFile.delete() }
         }
@@ -121,7 +123,7 @@ fun AppNavHost(
         composable<Routes.LogIn> {
             LogInScreen(
                 onMessageChange = onMessageChange,
-                networkService = networkService,
+                //networkService = networkService,
                 onNavigateHome = { navCtrller.navigate(Routes.Home) }
             )
         }
@@ -135,11 +137,13 @@ fun AppNavHost(
                     deletelist.forEach { card ->
                         val enFile = loadAudioFileFromDiskForText(
                             appContext = appContext,
-                            text = card.englishCard.orEmpty()
+                            text = card.englishCard.orEmpty(),
+                            language = "en"
                         ).file
                         val viFile = loadAudioFileFromDiskForText(
                             appContext = appContext,
-                            text = card.vietnameseCard.orEmpty()
+                            text = card.vietnameseCard.orEmpty(),
+                            language = "vi"
                         ).file
                         withContext(Dispatchers.IO) {
                             enFile.delete()

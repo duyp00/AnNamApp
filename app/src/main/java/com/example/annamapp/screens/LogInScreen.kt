@@ -23,8 +23,7 @@ import androidx.datastore.preferences.core.edit
 import com.example.annamapp.EMAIL
 import com.example.annamapp.TOKEN
 import com.example.annamapp.dataStore
-import com.example.annamapp.ui.NetworkService
-import com.example.annamapp.ui.UserCredential
+import com.example.annamapp.ui.ResponseJSON
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -32,7 +31,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun LogInScreen(
     onMessageChange: (String) -> Unit = {},
-    networkService: NetworkService,
+    //networkService: NetworkService,
     onNavigateHome: () -> Unit
 ) {
     LaunchedEffect(Unit) {
@@ -73,8 +72,8 @@ fun LogInScreen(
                     scope.launch {
                         try {
                             val resMessage = withContext(Dispatchers.IO) {
-                                val result =
-                                    networkService.generateToken(email = UserCredential(email))
+                                val result = ResponseJSON(code = 200, message = "this is a demo. enter any token")
+                                //networkService.generateToken(email = UserCredential(email))
                                 listOf(result.code.toString(), result.message)//.joinToString(", ")
                             }
                             onMessageChange("Response code = ${resMessage[0]}, message = ${resMessage[1]}")

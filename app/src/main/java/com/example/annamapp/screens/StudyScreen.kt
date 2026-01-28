@@ -36,7 +36,6 @@ import com.example.annamapp.EMAIL
 import com.example.annamapp.TOKEN
 import com.example.annamapp.dataStore
 import com.example.annamapp.room_sqlite_db.FlashCard
-import com.example.annamapp.ui.AudioRequestJSON
 import com.example.annamapp.ui.NetworkService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -45,7 +44,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
-import kotlin.io.encoding.Base64
 
 @Composable
 fun StudyScreen(
@@ -178,12 +176,14 @@ fun StudyScreen(
                                 if (playNew) {
                                     val fileLoad = loadAudioFileFromDiskForText(
                                         appContext = appContext,
-                                        text = displayText
+                                        text = displayText,
+                                        language = if (isVietnameseVisible) "vi" else "en"
                                     )
                                     if (!fileLoad.checkExisted) {
                                         val result = downloadAudioForWord(
                                             appContext = appContext,
                                             text = displayText,
+                                            language = if (isVietnameseVisible) "vi" else "en",
                                             networkService = networkService
                                         )
                                         if (result.status == "ERROR") {
@@ -246,9 +246,13 @@ fun instantiatePlayer(
     }
 }
 
-suspend fun loadAudioFileFromDiskForText(appContext : Context, text: String): FileLoadforWord {
+suspend fun loadAudioFileFromDiskForText(
+    appContext : Context,
+    text: String,
+    language: String
+): FileLoadforWord {
     val filename = withContext(Dispatchers.Default) {
-        sha256ofString(text)
+        audioCacheKey(text, language)
     }
     return withContext(Dispatchers.IO) {
         //directory or file path, treated as a file in Linux
@@ -265,31 +269,44 @@ suspend fun loadAudioFileFromDiskForText(appContext : Context, text: String): Fi
 suspend fun downloadAudioForWord(
     appContext: Context,
     text: String,
+    language: String,
     networkService: NetworkService
 ): AudioLoadResult {
     try {
         val filename = withContext(Dispatchers.Default) {
-            sha256ofString(text)
+            audioCacheKey(text, language)
         }
         return withContext(Dispatchers.IO) {
             val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
             val preferences: Preferences = preferencesFlow.first()
-            val response = networkService.fetchAudio(
-                cardWithCredential = AudioRequestJSON(
-                    word = text,
-                    email = preferences[EMAIL] ?: return@withContext
-                    AudioLoadResult.Error("Email not found"),
-                    token = preferences[TOKEN] ?: return@withContext
-                    AudioLoadResult.Error("Token not found")
-                )
-            )
-            if (response.code != 200) {
+            val hasEmail = !preferences[EMAIL].isNullOrBlank()
+            val hasToken = !preferences[TOKEN].isNullOrBlank()
+            if (!hasEmail || !hasToken) {
                 return@withContext AudioLoadResult.Error(
-                    "Response code is ${response.code}"
+                    "Please log in to access audio downloads"
                 )
             }
+            if (text.isBlank()) {
+                return@withContext AudioLoadResult.Error("Text is required for audio")
+            }
+            /*if (language != "en" && language != "vi") {
+                return@withContext AudioLoadResult.Error("Unsupported language: $language")
+            }*/
+            val response = networkService.fetchAudio(
+                text = text,
+                language = language
+            )
+            if (!response.isSuccessful) {
+                val errorBody = response.errorBody()?.string()
+                val errorSuffix = if (errorBody.isNullOrBlank()) "" else ": $errorBody"
+                return@withContext AudioLoadResult.Error(
+                    "Response code is ${response.code()}$errorSuffix"
+                )
+            }
+            val audioBody = response.body() ?:
+                return@withContext AudioLoadResult.Error("Empty audio response")
             val file = File(appContext.filesDir, filename)
-            val bytes = Base64.decode(response.message)
+            val bytes = audioBody.bytes()
             saveAudioToInternalStorage(file, bytes)
             AudioLoadResult.Success("Good to go")//implicit return
         }
@@ -333,6 +350,10 @@ fun sha256ofString(string: String): String {
         hexString.append(hex)
     }
     return hexString.toString()
+}
+
+fun audioCacheKey(text: String, language: String): String {
+    return sha256ofString("$language+|+$text")
 }
 
 @Composable
