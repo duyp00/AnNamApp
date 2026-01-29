@@ -142,7 +142,7 @@ fun SearchFieldSection(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             CheckboxRow(
-                text = "Match $label",
+                text = "Include $label",
                 checked = enabled,
                 onCheckedChange = onEnabledChange
             )
