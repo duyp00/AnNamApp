@@ -1,7 +1,12 @@
 package com.example.annamapp.screens
 
+import android.content.Context
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,6 +41,7 @@ import com.example.annamapp.ui.NetworkService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 @Composable
 fun CardDetailScreen(
@@ -53,7 +59,8 @@ fun CardDetailScreen(
     var vietnameseText by rememberSaveable { mutableStateOf(vnWord) }
     val scope = rememberCoroutineScope()
     var hasLoaded by rememberSaveable { mutableStateOf(false) }
-    val appContext = LocalContext.current.applicationContext
+    val context = LocalContext.current
+    val appContext = context.applicationContext
     //move player out of onClick so it is not re-created on every click
     var player by retain { mutableStateOf<ExoPlayer?>(null) }
 
@@ -129,7 +136,7 @@ fun CardDetailScreen(
             ) {
                 Text(deleteAudioButtonText)
             }
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = {
                     scope.launch {
@@ -163,18 +170,27 @@ fun CardDetailScreen(
             LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                 itemsIndexed(displayList, key = {index, pair -> "${pair.first}-$index"}) { index, (text, language) ->
                     val fileLoadState =
-                    produceState<FileLoadforWord?>(initialValue = null, /*key1 = text*/)
-                        {value = loadAudioFileFromDiskForText(
+                    produceState<FileLoadforWord?>(initialValue = null, /*key1 = text*/) {
+                        value = loadAudioFileFromDiskForText(
                             appContext = appContext,
                             text = text,
                             language = language
-                        )}
+                        )
+                    }
                     //produceState uses remember internally, so will rerun when config changes
                     val fileLoad = fileLoadState.value
                     if (fileLoad != null) {
-                        val audioFile = fileLoad.file
                         var existencePositive by rememberSaveable { mutableStateOf(fileLoad.checkExisted) }
                         if (existencePositive) {
+                            val audioFile = fileLoad.file
+                            var pendingExport by rememberSaveable { mutableStateOf<File?>(null) }
+                            pendingExport?.let {
+                                ExportLauncher(
+                                    file = it,
+                                    context = context,
+                                    onDone = { pendingExport = null }
+                                )
+                            }
                             WordAudioDisplay(
                                 word = fileLoad.fileName,
                                 onDeleteAudio = { //audioWordName ->
@@ -202,6 +218,9 @@ fun CardDetailScreen(
                                         player?.prepare()
                                         player?.play()
                                     }
+                                },
+                                onExportAudio = { //fileName ->
+                                    pendingExport = audioFile
                                 }
                             )
                         } else {
@@ -247,11 +266,41 @@ fun CardDetailScreen(
     }
 }
 
+fun exportFile(
+    context: Context,
+    source: File,
+    destinationUri: Uri
+) {
+    context.contentResolver.openOutputStream(destinationUri)?.use { output ->
+        source.inputStream().use { input ->
+            input.copyTo(output)
+        }
+    }
+}
+
+@Composable
+fun ExportLauncher(
+    file: File,
+    context: Context,
+    onDone: () -> Unit
+) {
+    val launcher = rememberLauncherForActivityResult(
+    ActivityResultContracts.CreateDocument("*/*")
+    ) { uri ->
+        uri?.let { exportFile(context, file, it) }
+        onDone()
+    }
+    LaunchedEffect(Unit) {
+        launcher.launch(file.name)
+    }
+}
+
 @Composable
 fun WordAudioDisplay(
     word: String,
     onDeleteAudio: (String) -> Unit,
-    onPlayAudio: (String) -> Unit
+    onPlayAudio: (String) -> Unit,
+    onExportAudio: (String) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(3.dp),
@@ -262,12 +311,34 @@ fun WordAudioDisplay(
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onClick = { onDeleteAudio(word) }) {
-                Text("Delete Audio")
+            Button(
+                onClick = { onDeleteAudio(word) },
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Text(
+                    "Delete Audio",
+                    modifier = Modifier.padding(horizontal = 5.dp)
+                )
             }
             Spacer(Modifier.width(4.dp))
-            Button(onClick = { onPlayAudio(word) }) {
-                Text("Play Audio")
+            Button(
+                onClick = { onPlayAudio(word) },
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Text(
+                    "Play Audio",
+                    modifier = Modifier.padding(horizontal = 5.dp)
+                )
+            }
+            Spacer(Modifier.width(4.dp))
+            Button(
+                onClick = { onExportAudio(word) },
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Text(
+                    "Export Audio",
+                    modifier = Modifier.padding(horizontal = 5.dp)
+                )
             }
         }
     }
