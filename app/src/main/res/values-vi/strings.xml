@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AnNamApp</string>
-    <string name="english_label">tieng_anh</string>
-    <string name="vietnamese_label">tieng_viet</string>
-    <string name="back_button_label">Quay_lai</string>
+    <string name="english_label">tiếng Anh</string>
+    <string name="vietnamese_label">tiếng Việt</string>
+    <string name="back_button_label">Quay lại</string>
 </resources>

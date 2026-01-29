@@ -64,7 +64,7 @@ fun SearchResultScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "${results.size} Cards", style = MaterialTheme.typography.titleMedium)
+            Text(text = "${results.size} Cards. ${selectedCardIds.size} Selected", style = MaterialTheme.typography.titleMedium)
             Button(
                 enabled = selectedCardIds.isNotEmpty(),
                 onClick = {

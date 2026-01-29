@@ -41,7 +41,7 @@ fun SearchScreen(
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
         SearchFieldSection(
             label = "English",

@@ -24,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.RetainedEffect
 import androidx.compose.runtime.retain.retain
@@ -89,7 +90,7 @@ fun CardDetailScreen(
     }
 
     Column(
-        Modifier.fillMaxSize().padding(24.dp)
+        Modifier.fillMaxSize().padding(15.dp)
     ) {
         var openAudioPanel by rememberSaveable { mutableStateOf(false) }
         var enInitial by rememberSaveable { mutableStateOf(enWord) }
@@ -109,8 +110,7 @@ fun CardDetailScreen(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-        Spacer(Modifier.height(24.dp))
-
+        Spacer(Modifier.height(10.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
@@ -168,8 +168,9 @@ fun CardDetailScreen(
             }
             //val displayList = rememberSaveable { listOf(englishText, vietnameseText) }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                itemsIndexed(displayList, key = {index, pair -> "${pair.first}-$index"}) { index, (text, language) ->
-                    val fileLoadState =
+                itemsIndexed(displayList, key = {index, pair -> "${pair.first}-$index"})
+                { index, (text, language) ->
+                    val fileLoadState = //produceState uses remember internally, so will rerun when config changes
                     produceState<FileLoadforWord?>(initialValue = null, /*key1 = text*/) {
                         value = loadAudioFileFromDiskForText(
                             appContext = appContext,
@@ -177,18 +178,20 @@ fun CardDetailScreen(
                             language = language
                         )
                     }
-                    //produceState uses remember internally, so will rerun when config changes
                     val fileLoad = fileLoadState.value
                     if (fileLoad != null) {
                         var existencePositive by rememberSaveable { mutableStateOf(fileLoad.checkExisted) }
                         if (existencePositive) {
-                            val audioFile = fileLoad.file
-                            var pendingExport by rememberSaveable { mutableStateOf<File?>(null) }
-                            pendingExport?.let {
-                                ExportLauncher(
-                                    file = it,
+                            val audioFile = remember { fileLoad.file }
+                            var enableExport by rememberSaveable { mutableStateOf(false) }
+                            if (enableExport) {
+                                SAFLauncher(
+                                    file = audioFile,
                                     context = context,
-                                    onDone = { pendingExport = null }
+                                    onDone = {
+                                        onMessageChange("Exported audio for \"$text\"")
+                                        enableExport = false
+                                    }
                                 )
                             }
                             WordAudioDisplay(
@@ -220,7 +223,7 @@ fun CardDetailScreen(
                                     }
                                 },
                                 onExportAudio = { //fileName ->
-                                    pendingExport = audioFile
+                                    enableExport = true
                                 }
                             )
                         } else {
@@ -279,19 +282,19 @@ fun exportFile(
 }
 
 @Composable
-fun ExportLauncher(
+fun SAFLauncher(
     file: File,
     context: Context,
     onDone: () -> Unit
 ) {
-    val launcher = rememberLauncherForActivityResult(
+    val exportLauncher = rememberLauncherForActivityResult(
     ActivityResultContracts.CreateDocument("*/*")
     ) { uri ->
         uri?.let { exportFile(context, file, it) }
         onDone()
     }
     LaunchedEffect(Unit) {
-        launcher.launch(file.name)
+        exportLauncher.launch(file.name)
     }
 }
 
@@ -312,21 +315,21 @@ fun WordAudioDisplay(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
-                onClick = { onDeleteAudio(word) },
-                contentPadding = PaddingValues(0.dp)
-            ) {
-                Text(
-                    "Delete Audio",
-                    modifier = Modifier.padding(horizontal = 5.dp)
-                )
-            }
-            Spacer(Modifier.width(4.dp))
-            Button(
                 onClick = { onPlayAudio(word) },
                 contentPadding = PaddingValues(0.dp)
             ) {
                 Text(
                     "Play Audio",
+                    modifier = Modifier.padding(horizontal = 5.dp)
+                )
+            }
+            Spacer(Modifier.width(4.dp))
+            Button(
+                onClick = { onDeleteAudio(word) },
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Text(
+                    "Delete Audio",
                     modifier = Modifier.padding(horizontal = 5.dp)
                 )
             }
