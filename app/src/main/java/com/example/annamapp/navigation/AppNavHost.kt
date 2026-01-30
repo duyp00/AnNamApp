@@ -6,7 +6,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.annamapp.room_sqlite_db.FlashCard
 import com.example.annamapp.room_sqlite_db.FlashCardDao
@@ -21,12 +20,13 @@ import com.example.annamapp.screens.loadAudioFileFromDiskForText
 import com.example.annamapp.ui.NetworkService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+
 //import com.example.annamapp.navigation.Routes.*
 
 @Composable
 fun AppNavHost(
     flashCardDao: FlashCardDao,
-    navCtrller: NavHostController = rememberNavController(),
+    navCtrller: NavHostController,
     modifier: Modifier,
     onMessageChange: (String) -> Unit = {},
     networkService: NetworkService

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
@@ -80,10 +81,10 @@ fun SearchScreen(
                     //under specific circumstances, Search button can behave identical to Show all cards
                     val filters = Routes.SearchResults(
                         englishQuery = englishQuery/*.trim()*/,
-                        englishEnabled = englishEnabled /*&& englishQuery.isNotBlank()*/,//isNotBlank() can
+                        englishEnabled = englishEnabled && englishQuery.isNotBlank(),//isNotBlank() can
                         englishWholeWord = englishWholeWord,     //silently alter user intention, so be cautious
                         vietnameseQuery = vietnameseQuery/*.trim()*/,
-                        vietnameseEnabled = vietnameseEnabled /*&& vietnameseQuery.isNotBlank()*/,
+                        vietnameseEnabled = vietnameseEnabled && vietnameseQuery.isNotBlank(),
                         vietnameseWholeWord = vietnameseWholeWord
                     )
                     onSearch(filters)
@@ -129,15 +130,14 @@ fun SearchFieldSection(
             onValueChange = onValueChange,
             label = { Text("$label word") },
             singleLine = true,
-            /*
-            keyboardOptions = KeyboardOptions(
+            /*keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
                 imeAction = ImeAction.Done
             )*/
         )
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().offset(x = (-10).dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {

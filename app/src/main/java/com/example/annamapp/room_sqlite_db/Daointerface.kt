@@ -41,12 +41,12 @@ interface FlashCardDao {
             "vietnamese_card LIKE :vietnamese LIMIT 1")
     suspend fun findByCards(english: String, vietnamese: String): FlashCard?
 
-    //change between AND and OR to match both or either one of the 2 fields
+    //change between AND and OR to match both or either one of the 2 fields, and ...Enabled = 0 / 1 and AND / OR
     @Query(
         "SELECT * FROM FlashCards WHERE " +
-                "(:englishEnabled = 0 OR " +
+                "(:englishEnabled = 1 AND " +
                 "(CASE WHEN :englishWholeWord = 1 THEN english_card = :englishQuery ELSE english_card LIKE '%' || :englishQuery || '%' END)) OR " +
-                "(:vietnameseEnabled = 0 OR " +
+                "(:vietnameseEnabled = 1 AND " +
                 "(CASE WHEN :vietnameseWholeWord = 1 THEN vietnamese_card = :vietnameseQuery ELSE vietnamese_card LIKE '%' || :vietnameseQuery || '%' END))"
     )
     suspend fun searchCards(

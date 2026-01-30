@@ -166,7 +166,6 @@ fun CardDetailScreen(
             val displayList = rememberSaveable(englishText, vietnameseText) {
                 listOf(englishText to "en", vietnameseText to "vi")
             }
-            //val displayList = rememberSaveable { listOf(englishText, vietnameseText) }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(5.dp)) {
                 itemsIndexed(displayList, key = {index, pair -> "${pair.first}-$index"})
                 { index, (text, language) ->
