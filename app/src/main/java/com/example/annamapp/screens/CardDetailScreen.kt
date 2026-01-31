@@ -68,7 +68,7 @@ fun CardDetailScreen(
     RetainedEffect(Unit) {
         onRetire {
             if (player != null) {
-                player?.release()
+                player!!.release()
                 player = null
                 onMessageChange("Player released")
             }
@@ -176,7 +176,7 @@ fun CardDetailScreen(
                             text = text,
                             language = language
                         )
-                    }
+                    } //or use "by" instead of "=", then no need .value
                     val fileLoad = fileLoadState.value
                     if (fileLoad != null) {
                         var existencePositive by rememberSaveable { mutableStateOf(fileLoad.checkExisted) }
@@ -187,8 +187,8 @@ fun CardDetailScreen(
                                 SAFLauncher(
                                     file = audioFile,
                                     context = context,
-                                    onDone = {
-                                        onMessageChange("Exported audio for \"$text\"")
+                                    onDone = { msg ->
+                                        onMessageChange(msg)
                                         enableExport = false
                                     }
                                 )
@@ -270,12 +270,18 @@ fun CardDetailScreen(
 
 fun exportFile(
     context: Context,
-    source: File,
+    sourceFile: File,
     destinationUri: Uri
 ) {
     context.contentResolver.openOutputStream(destinationUri)?.use { output ->
-        source.inputStream().use { input ->
-            input.copyTo(output)
+        sourceFile.inputStream().use { input ->
+            input.copyTo(
+                out = output,
+                bufferSize = 16 * 1024 //16KB. default is 8KB
+            )
+            //input and output stream are closed automatically by .use()
+            //input.close()
+            //output.close()
         }
     }
 }
@@ -284,13 +290,19 @@ fun exportFile(
 fun SAFLauncher(
     file: File,
     context: Context,
-    onDone: () -> Unit
+    onDone: (String) -> Unit
 ) {
     val exportLauncher = rememberLauncherForActivityResult(
     ActivityResultContracts.CreateDocument("*/*")
     ) { uri ->
-        uri?.let { exportFile(context, file, it) }
-        onDone()
+        var message = "Export cancelled"
+        uri?.let {
+            try {
+                exportFile(context, file, it)
+                message = "Exported to ${it.path}"
+            } catch (e: Exception) { message = "$e" }
+        }
+        onDone(message)
     }
     LaunchedEffect(Unit) {
         exportLauncher.launch(file.name)

@@ -81,10 +81,10 @@ fun SearchScreen(
                     //under specific circumstances, Search button can behave identical to Show all cards
                     val filters = Routes.SearchResults(
                         englishQuery = englishQuery/*.trim()*/,
-                        englishEnabled = englishEnabled && englishQuery.isNotBlank(),//isNotBlank() can
+                        englishEnabled = englishEnabled && englishQuery.isNotEmpty(),//isNotEmpty() can
                         englishWholeWord = englishWholeWord,     //silently alter user intention, so be cautious
                         vietnameseQuery = vietnameseQuery/*.trim()*/,
-                        vietnameseEnabled = vietnameseEnabled && vietnameseQuery.isNotBlank(),
+                        vietnameseEnabled = vietnameseEnabled && vietnameseQuery.isNotEmpty(),
                         vietnameseWholeWord = vietnameseWholeWord
                     )
                     onSearch(filters)

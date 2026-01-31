@@ -68,7 +68,7 @@ fun StudyScreen(
     RetainedEffect(Unit) {
         onRetire {
             if (player != null) {
-                player?.release()
+                player!!.release()
                 player = null
                 onMessageChange("Player released")
             }
@@ -303,10 +303,12 @@ suspend fun downloadAudioForWord(
                     "Response code is ${response.code()}$errorSuffix"
                 )
             }
-            val audioBody = response.body() ?:
+            val audioBody = response.body()
+            val bytes = audioBody?.bytes() ?: run {//.bytes() already consumes and closes the stream
+                //return@run ByteArray(0)                    //according to okhttp docs
                 return@withContext AudioLoadResult.Error("Empty audio response")
+            }
             val file = File(appContext.filesDir, filename)
-            val bytes = audioBody.bytes()
             saveAudioToInternalStorage(file, bytes)
             AudioLoadResult.Success("Good to go")//implicit return
         }
@@ -336,6 +338,8 @@ data class FileLoadforWord(
 fun saveAudioToInternalStorage(file: File, audioData: ByteArray) {
     FileOutputStream(file).use { fos ->
         fos.write(audioData)
+        //fos.flush()
+        //fos.close() //not needed because .use() close automatically
     }
 }
 
@@ -353,7 +357,7 @@ fun sha256ofString(string: String): String {
 }
 
 fun audioCacheKey(text: String, language: String): String {
-    return sha256ofString("$language+|+$text")
+    return sha256ofString("$language|$text")
 }
 
 @Composable
@@ -363,7 +367,6 @@ fun TextInputDialog(
     onDismiss: () -> Unit
 ) {
     var numberOfCardsAsString by rememberSaveable { mutableStateOf("") }
-
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
