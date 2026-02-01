@@ -252,7 +252,7 @@ suspend fun loadAudioFileFromDiskForText(
     language: String
 ): FileLoadforWord {
     val filename = withContext(Dispatchers.Default) {
-        audioCacheKey(text, language)
+        sha256ofString("$language|$text")
     }
     return withContext(Dispatchers.IO) {
         //directory or file path, treated as a file in Linux
@@ -274,7 +274,7 @@ suspend fun downloadAudioForWord(
 ): AudioLoadResult {
     try {
         val filename = withContext(Dispatchers.Default) {
-            audioCacheKey(text, language)
+            sha256ofString("$language|$text")
         }
         return withContext(Dispatchers.IO) {
             val preferencesFlow: Flow<Preferences> = appContext.dataStore.data
@@ -303,9 +303,9 @@ suspend fun downloadAudioForWord(
                     "Response code is ${response.code()}$errorSuffix"
                 )
             }
-            val audioBody = response.body()
-            val bytes = audioBody?.bytes() ?: run {//.bytes() already consumes and closes the stream
-                //return@run ByteArray(0)                    //according to okhttp docs
+            val bytes = response.body()?.bytes() ?: run {
+                //.bytes() already consumes and closes the stream according to okhttp docs
+                //return@run ByteArray(0)
                 return@withContext AudioLoadResult.Error("Empty audio response")
             }
             val file = File(appContext.filesDir, filename)
@@ -354,10 +354,6 @@ fun sha256ofString(string: String): String {
         hexString.append(hex)
     }
     return hexString.toString()
-}
-
-fun audioCacheKey(text: String, language: String): String {
-    return sha256ofString("$language|$text")
 }
 
 @Composable

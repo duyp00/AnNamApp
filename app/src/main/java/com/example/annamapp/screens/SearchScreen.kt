@@ -137,14 +137,15 @@ fun SearchFieldSection(
         )
 
         Row(
-            modifier = Modifier.fillMaxWidth().offset(x = (-10).dp),
+            modifier = Modifier.offset(x = (-10).dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            //horizontalArrangement = Arrangement.SpaceBetween
         ) {
             CheckboxRow(
                 text = "Include $label",
                 checked = enabled,
-                onCheckedChange = onEnabledChange
+                onCheckedChange = onEnabledChange,
+                modifier = Modifier.weight(1f)
             )
 
             CheckboxRow(
@@ -162,9 +163,10 @@ fun CheckboxRow(
     text: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
     //enabled: Boolean = true
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
         Checkbox(checked = checked, onCheckedChange = { onCheckedChange(it) }, /*enabled = enabled*/)
         Text(text)
     }

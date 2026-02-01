@@ -27,7 +27,7 @@ import kotlinx.coroutines.withContext
 fun AppNavHost(
     flashCardDao: FlashCardDao,
     navCtrller: NavHostController,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onMessageChange: (String) -> Unit = {},
     networkService: NetworkService
 ) {

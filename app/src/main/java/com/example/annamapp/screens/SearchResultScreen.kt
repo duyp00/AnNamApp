@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -120,8 +121,8 @@ fun ResultRow(
     onViewClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(3.dp),
-        //verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth().padding(bottom = 3.dp).offset(x = (-5).dp),
+        verticalAlignment = Alignment.CenterVertically,
         //horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Checkbox(checked = isSelected, onCheckedChange = onSelectionChange)
