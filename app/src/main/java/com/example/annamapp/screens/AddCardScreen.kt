@@ -56,7 +56,7 @@ fun AddCardScreen(
         Button(onClick = {
             //clickOnAdd = true
             scope.launch {
-                try {
+                try { //if use conflict strategy = ABORT, no need findByWord, because it will throw exception itself
                     if (findByWord(enWord, vnWord) != null) {
                         throw SQLiteException("Card already exists in database.")
                     }
@@ -68,8 +68,8 @@ fun AddCardScreen(
                         )
                     )
                     onMessageChange("Added card: [$enWord, $vnWord]")
-                } catch (ex: Exception) {
-                    onMessageChange("$ex") //equivalent to ex.toString() (no double quotes). if more friendly: ex.localizedMessage
+                } catch (ex: SQLiteException) {
+                    onMessageChange("$ex") //equivalent to ex.toString() (no double quotes). more friendly: ex.localizedMessage
                 } finally {
                     enWord = ""
                     vnWord = ""

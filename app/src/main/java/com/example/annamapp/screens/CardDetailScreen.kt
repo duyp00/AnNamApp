@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.sqlite.SQLiteException
 import com.example.annamapp.room_sqlite_db.FlashCard
 import com.example.annamapp.ui.NetworkService
 import kotlinx.coroutines.Dispatchers
@@ -149,12 +150,16 @@ fun CardDetailScreen(
                             englishCard = englishText,
                             vietnameseCard = vietnameseText
                         ) ?: return@launch
-                        updateCard(updatedCard, enInitial, vnInitial)
-                        //set initials to current after update. use mutableStateOf to be observable
-                        enInitial = englishText
-                        vnInitial = vietnameseText
-                        onMessageChange("Card updated to \"$enInitial\" - \"$vnInitial\"")
-                        //onNavigateBack()
+                        try {
+                            updateCard(updatedCard, enInitial, vnInitial)
+                            //set initials to current after update. use mutableStateOf to be observable
+                            onMessageChange("Updated: \"$enInitial\" - \"$vnInitial\" -> \"$englishText\" - \"$vietnameseText\"")
+                            enInitial = englishText
+                            vnInitial = vietnameseText
+                            //onNavigateBack()
+                        } catch (e: SQLiteException) {
+                            onMessageChange("$e")
+                        }
                     }
                 }
             ) {

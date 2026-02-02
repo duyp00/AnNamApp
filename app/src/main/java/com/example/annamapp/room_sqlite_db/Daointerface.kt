@@ -68,7 +68,7 @@ interface FlashCardDao {
     @Delete
     suspend fun delete(flashCard: FlashCard)
 
-    @Update(onConflict = OnConflictStrategy.IGNORE)
+    @Update(onConflict = OnConflictStrategy.ABORT) //IGNORE is good, but ABORT is used to capture conflicts
     suspend fun updateCard(flashCard: FlashCard)
 
     //@Query("SELECT * FROM FlashCards LIMIT :size")
