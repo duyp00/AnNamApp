@@ -14,7 +14,7 @@ import kotlinx.parcelize.Parcelize
         value = ["english_card", "vietnamese_card"],
         unique = true)]
 ) data class FlashCard(
-    @PrimaryKey(autoGenerate = true) val uid: Int,
+    @PrimaryKey(autoGenerate = true) val uid: Long = 0L, //auto generated so set 0L as placeholder so no longer need to specify when inserting
     @ColumnInfo(name = "english_card") val englishCard: String?,
     @ColumnInfo(name = "vietnamese_card") val vietnameseCard: String?
 ): Parcelable

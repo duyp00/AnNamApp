@@ -54,7 +54,7 @@ fun CardDetailScreen(
     findByWord: suspend (String, String) -> FlashCard?,
     networkService: NetworkService
     /*deleteCard: suspend (FlashCard) -> Unit,*/ /*onNavigateBack: () -> Unit,*/
-    /*getCardById: suspend (Int) -> FlashCard?,*/ /*cardId: Int,*/
+    /*getCardById: suspend (Long) -> FlashCard?,*/ /*cardId: Long,*/
 ) {
     //var card by rememberSaveable { mutableStateOf<FlashCard?>(null) }
     var englishText by rememberSaveable { mutableStateOf(enWord) }
@@ -152,14 +152,14 @@ fun CardDetailScreen(
                         ) ?: return@launch
                         try {
                             updateCard(updatedCard, enInitial, vnInitial)
-                            //set initials to current after update. use mutableStateOf to be observable
-                            onMessageChange("Updated: \"$enInitial\" - \"$vnInitial\" -> \"$englishText\" - \"$vietnameseText\"")
-                            enInitial = englishText
-                            vnInitial = vietnameseText
-                            //onNavigateBack()
                         } catch (e: SQLiteException) {
                             onMessageChange("$e")
+                            return@launch
                         }
+                        onMessageChange("Updated: \"$enInitial\" - \"$vnInitial\" -> \"$englishText\" - \"$vietnameseText\"")
+                        enInitial = englishText
+                        vnInitial = vietnameseText
+                        //onNavigateBack()
                     }
                 }
             ) {

@@ -79,6 +79,7 @@ fun LogInScreen(
                             onMessageChange("Response code = ${resMessage[0]}, message = ${resMessage[1]}")
                         } catch (e: Exception) {
                             onMessageChange("Error in the token request: $e")
+                            //return@launch //not necessary because it's the last statement
                         }
                     }
                 },

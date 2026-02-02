@@ -62,7 +62,6 @@ fun AddCardScreen(
                     }
                     insertFlashCard(
                         FlashCard(
-                            uid = 0, //best value to choose is 0 since it's auto-generated
                             englishCard = enWord,
                             vietnameseCard = vnWord
                         )

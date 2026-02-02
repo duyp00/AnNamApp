@@ -21,7 +21,7 @@ interface FlashCardDao {
     //suspend fun loadAllByIds(flashCardIds: IntArray): List<FlashCard>
 
     //@Query("SELECT * FROM FlashCards WHERE uid = :uid LIMIT 1")
-    //suspend fun getCardById(uid: Int): FlashCard?
+    //suspend fun getCardById(uid: Long): FlashCard?
 
     /*@Query(
         "UPDATE FlashCards SET english_card = :englishNew, vietnamese_card = :vietnameseNew " +

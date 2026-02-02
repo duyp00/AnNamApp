@@ -56,7 +56,7 @@ fun AppNavHost(
             withContext(Dispatchers.IO) { oldAudioFile.delete() }
         }
     }
-    //val getCardById: suspend (Int) -> FlashCard? = {
+    //val getCardById: suspend (Long) -> FlashCard? = {
     //    flashCardDao.getCardById(it)
     //}
     val deleteCard: suspend (FlashCard) -> Unit = {
@@ -124,7 +124,11 @@ fun AppNavHost(
             LogInScreen(
                 onMessageChange = onMessageChange,
                 //networkService = networkService,
-                onNavigateHome = { navCtrller.navigate(Routes.Home) }
+                onNavigateHome = { navCtrller.popBackStack(
+                    route = Routes.Home,
+                    inclusive = false,
+                    saveState = false
+                ) }
             )
         }
 

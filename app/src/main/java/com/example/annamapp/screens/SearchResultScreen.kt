@@ -36,7 +36,7 @@ fun SearchResultScreen(
     onMessageChange: (String) -> Unit = {}
 ) {
     var results by rememberSaveable { mutableStateOf<List<FlashCard>>(listOf()) }
-    var selectedCardIds by rememberSaveable { mutableStateOf<Set<Int>>(setOf()) }
+    var selectedCardIds by rememberSaveable { mutableStateOf<Set<Long>>(setOf()) }
     val scope = rememberCoroutineScope()
     var hasLoaded by rememberSaveable { mutableStateOf(false) }
 
