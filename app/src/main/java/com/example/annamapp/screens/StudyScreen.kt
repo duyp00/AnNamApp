@@ -36,7 +36,7 @@ import com.example.annamapp.EMAIL
 import com.example.annamapp.TOKEN
 import com.example.annamapp.dataStore
 import com.example.annamapp.room_sqlite_db.FlashCard
-import com.example.annamapp.ui.NetworkService
+import com.example.annamapp.networking.NetworkService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

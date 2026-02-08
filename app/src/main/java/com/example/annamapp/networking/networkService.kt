@@ -1,4 +1,4 @@
-package com.example.annamapp.ui
+package com.example.annamapp.networking
 
 import okhttp3.ResponseBody
 import retrofit2.Response

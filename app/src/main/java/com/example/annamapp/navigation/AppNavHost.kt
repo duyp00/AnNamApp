@@ -17,7 +17,7 @@ import com.example.annamapp.screens.SearchResultScreen
 import com.example.annamapp.screens.SearchScreen
 import com.example.annamapp.screens.StudyScreen
 import com.example.annamapp.screens.loadAudioFileFromDiskForText
-import com.example.annamapp.ui.NetworkService
+import com.example.annamapp.networking.NetworkService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

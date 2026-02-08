@@ -2,10 +2,13 @@ package com.example.annamapp.ui
 
 //import androidx.navigation.toRoute
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +39,7 @@ import com.example.annamapp.TOKEN
 import com.example.annamapp.dataStore
 import com.example.annamapp.navigation.AppNavHost
 import com.example.annamapp.navigation.Routes
+import com.example.annamapp.networking.NetworkService
 import com.example.annamapp.room_sqlite_db.FlashCardDao
 import kotlinx.coroutines.launch
 
@@ -110,11 +114,15 @@ fun CardStudyApp(
         },
         bottomBar = {
             BottomAppBar(modifier = Modifier.height(85.dp)) {
-                Text(text = message, modifier = Modifier.semantics {
-                    contentDescription = "Message"
-                },
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Box(
+                    modifier = Modifier//.height(85.dp)
+                        .verticalScroll(rememberScrollState())//.padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
     ) { innerPadding ->

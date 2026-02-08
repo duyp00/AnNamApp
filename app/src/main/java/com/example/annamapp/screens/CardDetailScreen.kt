@@ -39,7 +39,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.sqlite.SQLiteException
 import com.example.annamapp.room_sqlite_db.FlashCard
-import com.example.annamapp.ui.NetworkService
+import com.example.annamapp.networking.NetworkService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

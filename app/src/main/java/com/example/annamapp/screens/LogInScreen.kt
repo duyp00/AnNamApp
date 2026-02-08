@@ -23,7 +23,7 @@ import androidx.datastore.preferences.core.edit
 import com.example.annamapp.EMAIL
 import com.example.annamapp.TOKEN
 import com.example.annamapp.dataStore
-import com.example.annamapp.ui.ResponseJSON
+import com.example.annamapp.networking.ResponseJSON
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

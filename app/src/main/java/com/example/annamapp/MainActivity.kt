@@ -9,7 +9,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.example.annamapp.room_sqlite_db.AnNamDatabase
 import com.example.annamapp.ui.CardStudyApp
-import com.example.annamapp.ui.NetworkService
+import com.example.annamapp.networking.NetworkService
 import com.example.annamapp.ui.theme.AnNamAppTheme
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
