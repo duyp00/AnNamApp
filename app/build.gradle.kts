@@ -109,7 +109,7 @@ dependencies {
 
     implementation(libs.androidx.navigation.compose)
 
-    implementation(libs.androidx.navigation.testing)
+    //implementation(libs.androidx.navigation.testing)
 
     implementation(libs.core.ktx)
 
@@ -153,19 +153,15 @@ dependencies {
     implementation(libs.androidx.navigation.compose) // Ensure you have a recent version
     implementation(libs.kotlinx.serialization.json)
 
-    // optional - Test helpers
-
     testImplementation(libs.androidx.room.testing)
 
     //testImplementation(kotlin("test"))
     implementation(libs.retrofit)
     implementation(libs.retrofit2.converter.gson)
 
-    // datastore
-    // Preferences DataStore (SharedPreferences like APIs)
     implementation(libs.datastore.preferences)
-    // Alternatively - without an Android dependency.
-    implementation(libs.androidx.datastore.preferences.core)
+    //implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.androidx.media3.exoplayer)
     //implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.androidx.compose.material.icons.extended)
 }

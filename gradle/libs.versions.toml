@@ -6,7 +6,7 @@ composeVersion = "1.10.2"
 
 converterGson = "3.0.0"
 datastorePreferences = "1.2.0"
-datastorePreferencesCore = "1.2.0"
+#datastorePreferencesCore = "1.2.0"
 kotlin = "2.3.10"
 
 coreKtx = "1.17.0"
@@ -31,7 +31,7 @@ material3 = "1.4.0"
 
 navigationRuntimeKtx = "2.9.7"
 
-navigationTesting = "2.9.7"
+#navigationTesting = "2.9.7"
 
 retrofit = "3.0.0"
 robolectric = "4.16.1"
@@ -49,13 +49,14 @@ media3Exoplayer = "1.9.2"
 
 [libraries]
 
+androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "composeVersion" }
 
 androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "composeVersion" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 
-androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastorePreferencesCore" }
+#androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastorePreferencesCore" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
 
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomVersion" }
@@ -83,7 +84,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3",
 
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 
-androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
+#androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 
 #kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }

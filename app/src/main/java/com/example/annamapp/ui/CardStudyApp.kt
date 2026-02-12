@@ -9,12 +9,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +39,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.edit
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -62,77 +72,124 @@ fun CardStudyApp(
     // 3. Get the current route as a STRING.
     val currentRouteString = navBackStackEntry?.destination?.route
 
-    var message by rememberSaveable { mutableStateOf("") }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-    Scaffold(
-        topBar = {
-            // 4. Compare strings to determine if the back button should be shown.
-            val showBack = currentRouteString != homeRouteString
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(end = 15.dp, start = 10.dp, top = 20.dp)
-            ) {
-                if (showBack) {
-                    TextButton(
-                        content = { Text(stringResource(R.string.back_button_label)) },
-                        onClick = { navController.navigateUp() }, //or popBackStack(), but if click too fast it pop the NavHost
-                        modifier = Modifier.semantics { contentDescription = "navigateBack" },
-                        border = BorderStroke(width = 1.dp, color = Color.Gray),
-                        //colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                        //    containerColor = Color.Transparent,
-                        //    contentColor = MaterialTheme.colorScheme.primary,
-                        //),
-                    )
-                }
+    // 4. Compare strings to determine if we are on the home screen.
+    val isHome = currentRouteString == homeRouteString
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        // Only allow gestures to open the drawer when not on the home screen
+        gesturesEnabled = !isHome,
+        drawerContent = {
+            ModalDrawerSheet {
                 Text(
-                    // 5. Pass the current route STRING to the title helper
-                    text = titleForRoute(currentRouteString),
-                    modifier = Modifier.weight(1f)
-                        .semantics{contentDescription = "screen_title"},
-                    style = MaterialTheme.typography.titleLarge
+                    "Navigate to",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(16.dp)
                 )
-                if (!showBack) {
-                    Button(
-                        modifier = Modifier.semantics { contentDescription = "ExecuteLogout" },
+                // Drawer items for navigation
+                val drawerItems = listOf(
+                    "Study" to Routes.Study,
+                    "Add" to Routes.Add,
+                    "Search" to Routes.Search,
+                    "Log In" to Routes.LogIn
+                )
+                drawerItems.forEach { (label, route) ->
+                    NavigationDrawerItem(
+                        label = { Text(label) },
+                        selected = currentRouteString == route::class.qualifiedName,
                         onClick = {
-                            scope.launch {
-                                appContext.dataStore.edit { preferences ->
-                                    preferences.remove(EMAIL)
-                                    preferences.remove(TOKEN)
-                                    message = preferences[EMAIL] ?: ""
+                            scope.launch { drawerState.close() }
+                            navController.navigate(route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
                                 }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                        }
-                    ) {
-                        Text(
-                            "Log out",
-                            modifier = Modifier.semantics { contentDescription = "Logout" }
-                        )
-                    }
-                }
-            }
-        },
-        bottomBar = {
-            BottomAppBar(modifier = Modifier.height(85.dp)) {
-                Box(
-                    modifier = Modifier//.height(85.dp)
-                        .verticalScroll(rememberScrollState())//.padding(horizontal = 16.dp)
-                ) {
-                    Text(
-                        text = message,
-                        style = MaterialTheme.typography.bodyMedium
+                        },
+                        modifier = Modifier.padding(horizontal = 12.dp)
                     )
                 }
             }
         }
-    ) { innerPadding ->
-        AppNavHost(
-            flashCardDao = flashCardDao,
-            onMessageChange = {message = it},
-            navCtrller = navController,
-            modifier = Modifier.padding(innerPadding).fillMaxSize(),
-            networkService = networkService
-        )
+    ) {
+        var message by rememberSaveable { mutableStateOf("") }
+        Scaffold(
+            topBar = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(end = 15.dp, start = 10.dp, top = 20.dp)
+                ) {
+                    if (!isHome) {
+                        TextButton(
+                            content = { Text(stringResource(R.string.back_button_label)) },
+                            onClick = { navController.navigateUp() }, //or popBackStack(), but if click too fast it pop the NavHost
+                            modifier = Modifier.semantics { contentDescription = "navigateBack" },
+                            border = BorderStroke(width = 1.dp, color = Color.Gray),
+                            //colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                            //    containerColor = Color.Transparent,
+                            //    contentColor = MaterialTheme.colorScheme.primary,
+                            //),
+                        )
+                    }
+                    Text(
+                        // 5. Pass the current route STRING to the title helper
+                        text = titleForRoute(currentRouteString),
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    if (isHome) {
+                        Button(
+                            modifier = Modifier.semantics { contentDescription = "ExecuteLogout" },
+                            onClick = {
+                                scope.launch {
+                                    appContext.dataStore.edit { preferences ->
+                                        preferences.remove(EMAIL)
+                                        preferences.remove(TOKEN)
+                                        message = preferences[EMAIL] ?: ""
+                                    }
+                                }
+                            }
+                        ) {
+                            Text("Log out")
+                        }
+                    } else {
+                        // Drawer icon at the top right for non-home screens
+                        IconButton(
+                            onClick = { scope.launch { drawerState.open() } },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = "Navigation menu"
+                            )
+                        }
+                    }
+                }
+            },
+            bottomBar = {
+                BottomAppBar(modifier = Modifier.height(85.dp)) {
+                    Box(
+                        modifier = Modifier//.height(85.dp)
+                            .verticalScroll(rememberScrollState())//.padding(horizontal = 16.dp)
+                    ) {
+                        Text(
+                            text = message,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
+        ) { innerPadding ->
+            AppNavHost(
+                flashCardDao = flashCardDao,
+                onMessageChange = {message = it},
+                navCtrller = navController,
+                modifier = Modifier.padding(innerPadding).fillMaxSize(),
+                networkService = networkService
+            )
+        }
     }
 }
 
