@@ -4,9 +4,9 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
-    id("org.jetbrains.kotlin.jvm") version "2.3.0"
+    id("org.jetbrains.kotlin.jvm") version "2.3.10"
     id("com.google.devtools.ksp") version "2.3.2" apply false
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0" apply false
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.10" apply false
 }
 
 kotlin {

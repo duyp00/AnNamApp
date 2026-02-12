@@ -154,3 +154,63 @@ fun titleForRoute(route: String?): String {
         else -> "New screen"
     }
 }
+
+/*
+Bottom navigation how-to:
+1. Define Destinations: Create a sealed class or data objects to define your app's screens and their corresponding routes in a type-safe manner.
+sealed class Screen(val route: String, val icon: ImageVector, val label: String) {
+    object Home : Screen("home", Icons.Default.Home, "Home")
+    object Profile : Screen("profile", Icons.Default.Person, "Profile")
+    object Settings : Screen("settings", Icons.Default.Settings, "Settings")
+}
+val items = listOf(Screen.Home, Screen.Profile, Screen.Settings)
+
+2. Set up NavController and NavHost: In your main activity or a central navigation file, create the NavController and the NavHost within a Scaffold. The Scaffold allows you to position the NavigationBar at the bottom and the NavHost in the main content area.
+@Composable
+fun AppNavigation() {
+    val navController = rememberNavController()
+    Scaffold(
+        bottomBar = { BottomNavigationBar(navController = navController) }
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Home.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(Screen.Home.route) { /* Home Screen Composable */ }
+            composable(Screen.Profile.route) { /* Profile Screen Composable */ }
+            composable(Screen.Settings.route) { /* Settings Screen Composable */ }
+        }
+    }
+}
+
+3. Implement the Navigation Bar: Create the BottomNavigationBar composable, which uses NavigationBarItem to handle user clicks and navigate between destinations.
+@Composable
+fun BottomNavigationBar(navController: NavController) {
+    NavigationBar {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+        items.forEach { screen ->
+            NavigationBarItem(
+                icon = { Icon(screen.icon, contentDescription = null) },
+                label = { Text(screen.label) },
+                selected = currentRoute == screen.route,
+                onClick = {
+                    navController.navigate(screen.route) {
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        // on the back stack as users select items
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true // Save the state of the popped destinations
+                        }
+                        // Avoid multiple copies of the same destination when reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    }
+}
+*/

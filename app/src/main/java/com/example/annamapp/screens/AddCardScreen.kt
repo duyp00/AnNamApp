@@ -26,8 +26,7 @@ fun AddCardScreen(
     findByWord: suspend (String, String) -> FlashCard?,
     onMessageChange: (String) -> Unit = {}
 ) {
-    //var clickOnAdd by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { //according to chatgpt i should use this
+    LaunchedEffect(Unit) {
         onMessageChange("Add your cards now")
     }
     val scope = rememberCoroutineScope()
@@ -47,14 +46,7 @@ fun AddCardScreen(
             label = { Text(stringResource(R.string.vietnamese_label)) }
         )
 
-        /*
-        if (clickOnAdd) {
-            Text("The card is [$enWord, $vnWord] ...")
-        }
-        else { {} }*/
-
         Button(onClick = {
-            //clickOnAdd = true
             scope.launch {
                 try { //if use conflict strategy = ABORT, no need findByWord, because it will throw exception itself
                     if (findByWord(enWord, vnWord) != null) {

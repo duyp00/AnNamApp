@@ -11,14 +11,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AnNamApp">
+        <!-- (in <activity>) some config change types:
+        android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|smallestScreenSize|uiMode|layoutDirection|density|touchscreen|keyboard|navigation|navigationHidden|colorMode|locale|mcc|mnc|fontScale|fontWeightAdjustment"
+        -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|layoutDirection"
             android:label="@string/app_name"
             android:theme="@style/Theme.AnNamApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
