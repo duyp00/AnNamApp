@@ -58,11 +58,11 @@ android {
         compose = true
     }
 
-    androidResources {
+    //androidResources {
 
-        generateLocaleConfig = true
+    //    generateLocaleConfig = true
 
-    }
+    //}
 
     testOptions {
 
@@ -111,7 +111,7 @@ dependencies {
 
     //implementation(libs.androidx.navigation.testing)
 
-    implementation(libs.core.ktx)
+    //implementation(libs.core.ktx)
 
     implementation(libs.androidx.compose.ui.test.junit4)
 
@@ -150,7 +150,6 @@ dependencies {
 
     implementation(libs.androidx.room.ktx)
 
-    implementation(libs.androidx.navigation.compose) // Ensure you have a recent version
     implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.androidx.room.testing)
@@ -163,5 +162,6 @@ dependencies {
     //implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.androidx.media3.exoplayer)
     //implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.androidx.compose.material.icons.extended)
+    //implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.compose.material.icons.core)
 }

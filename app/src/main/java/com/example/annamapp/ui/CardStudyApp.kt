@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -79,10 +81,14 @@ fun CardStudyApp(
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        // Only allow gestures to open the drawer when not on the home screen
-        gesturesEnabled = !isHome,
+        gesturesEnabled = drawerState.isOpen /*|| !isHome*/,
         drawerContent = {
-            ModalDrawerSheet {
+            val configuration/*: Configuration*/ = LocalConfiguration.current
+            val widthDp: Int = configuration.screenWidthDp
+            ModalDrawerSheet(
+                //prevent filling whole screen on smaller devices
+                modifier = Modifier.width((widthDp * 0.7).dp)
+            ) {
                 Text(
                     "Navigate to",
                     style = MaterialTheme.typography.titleMedium,
