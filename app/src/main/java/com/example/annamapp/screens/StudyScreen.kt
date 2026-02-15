@@ -35,8 +35,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.example.annamapp.EMAIL
 import com.example.annamapp.TOKEN
 import com.example.annamapp.dataStore
-import com.example.annamapp.room_sqlite_db.FlashCard
 import com.example.annamapp.networking.NetworkService
+import com.example.annamapp.room_sqlite_db.FlashCard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -90,7 +90,7 @@ fun StudyScreen(
         }
     }
 
-    LaunchedEffect(numberOfCardsToStudy) {
+    LaunchedEffect(hasLoaded) {
         if (!hasLoaded) {
             loadCards()
             hasLoaded = true
@@ -103,8 +103,8 @@ fun StudyScreen(
             onConfirm = { input ->
                 val num = input.toIntOrNull()
                 if (num != null && num > 0) {
-                    hasLoaded = false
                     numberOfCardsToStudy = num
+                    hasLoaded = false
                 } else {
                     onMessageChange("Invalid input")
                 }

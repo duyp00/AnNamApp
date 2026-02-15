@@ -63,6 +63,7 @@ fun CardStudyApp(
 ) {
     //val navController = rememberNavController()
     val scope = rememberCoroutineScope()
+    val configuration/*: Configuration*/ = LocalConfiguration.current
     val context = LocalContext.current
     val appContext = context.applicationContext
 
@@ -83,7 +84,6 @@ fun CardStudyApp(
         drawerState = drawerState,
         gesturesEnabled = drawerState.isOpen /*|| !isHome*/,
         drawerContent = {
-            val configuration/*: Configuration*/ = LocalConfiguration.current
             val widthDp: Int = configuration.screenWidthDp
             ModalDrawerSheet(
                 //prevent filling whole screen on smaller devices
@@ -108,10 +108,17 @@ fun CardStudyApp(
                         onClick = {
                             scope.launch { drawerState.close() }
                             navController.navigate(route) {
+                                // Pop up to the start destination of the graph to
+                                // avoid building up a large stack of destinations
+                                // on the back stack as users select items
                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                                    if (currentRouteString != Routes.Study::class.qualifiedName) {
+                                        saveState = true // Save the state of the popped destinations
+                                    }
                                 }
+                                // Avoid multiple copies of the same destination when reselecting the same item
                                 launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
                                 restoreState = true
                             }
                         },

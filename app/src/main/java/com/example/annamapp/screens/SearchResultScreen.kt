@@ -16,6 +16,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +48,12 @@ fun SearchResultScreen(
         //selectedCardIds = setOf() //not here otherwise navigating back would clear selection
         if (results.isEmpty()) {
             onMessageChange("No cards found")
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            hasLoaded = false //reset load state when leaving screen to ensure fresh data when returning
         }
     }
 
@@ -106,7 +113,7 @@ fun SearchResultScreen(
                         },
                         onViewClick = {
                             onNavigateToCard(card.englishCard.orEmpty(), card.vietnameseCard.orEmpty())
-                            hasLoaded = false //to refresh results when navigating back
+                            //hasLoaded = false //to refresh results when navigating back, commented out since already handled by DisposableEffect
                         }
                     )
                     HorizontalDivider(thickness = DividerDefaults.Thickness, color = DividerDefaults.color)

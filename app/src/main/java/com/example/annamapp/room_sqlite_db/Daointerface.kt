@@ -11,9 +11,6 @@ import androidx.room.Update
 
 @Dao
 interface FlashCardDao {
-    //@RawQuery
-    //fun checkpoint(supportSQLiteQuery: SupportSQLiteQuery): Int
-
     @Query("SELECT * FROM FlashCards")
     suspend fun getAll(): List<FlashCard>
 
