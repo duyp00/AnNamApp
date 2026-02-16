@@ -135,9 +135,10 @@ fun StudyScreen(
         val currentCard = cardList[currentIndex]
         val displayText = (if (isVietnameseVisible) currentCard.vietnameseCard else currentCard.englishCard) ?: ""
         var playNew by rememberSaveable { mutableStateOf(true) }
+        val currentLanguageAndCardIndex = "$currentIndex|${if (isVietnameseVisible) "Vietnamese" else "English"}"
 
         Text(
-            text = if (isVietnameseVisible) "Vietnamese" else "English",
+            text = currentLanguageAndCardIndex,
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center
         )

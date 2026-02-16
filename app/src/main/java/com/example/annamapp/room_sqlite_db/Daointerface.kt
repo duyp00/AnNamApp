@@ -56,7 +56,7 @@ interface FlashCardDao {
     ): List<FlashCard>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertAll(vararg flashCard: FlashCard)
+    suspend fun insertAll(vararg flashCard: FlashCard): List<Long>
 
     /**
      * Deletes a card.

@@ -6,8 +6,10 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
-@Parcelize //if app is put to background at any screen, it can then be restored instantly
+@Serializable //for serialization and deserialization of FlashCard objects, useful for saving to file or sending over network. This allows FlashCard instances to be easily converted to and from formats like JSON, which can be beneficial for data persistence or communication between different parts of the app or with external services.
+@Parcelize //allow FlashCard objects to be passed between Android components (e.g., Activities, Fragments) via Intents or Bundles. This is especially useful for passing FlashCard objects as arguments in navigation components or when starting new activities that require FlashCard data.
 @Entity(
     tableName = "FlashCards",
     indices = [Index(

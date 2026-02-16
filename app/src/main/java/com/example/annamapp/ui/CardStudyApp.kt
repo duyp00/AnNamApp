@@ -99,6 +99,7 @@ fun CardStudyApp(
                     "Study" to Routes.Study,
                     "Add" to Routes.Add,
                     "Search" to Routes.Search,
+                    "Backup" to Routes.Backup,
                     "Log In" to Routes.LogIn
                 )
                 drawerItems.forEach { (label, route) ->
@@ -112,9 +113,10 @@ fun CardStudyApp(
                                 // avoid building up a large stack of destinations
                                 // on the back stack as users select items
                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    if (currentRouteString != Routes.Study::class.qualifiedName) {
-                                        saveState = true // Save the state of the popped destinations
-                                    }
+                                    if (
+                                        currentRouteString != Routes.Study::class.qualifiedName
+                                    )
+                                    { saveState = true /*Save the state of the popped destinations*/ }
                                 }
                                 // Avoid multiple copies of the same destination when reselecting the same item
                                 launchSingleTop = true
@@ -182,9 +184,9 @@ fun CardStudyApp(
                 }
             },
             bottomBar = {
-                BottomAppBar(modifier = Modifier.height(85.dp)) {
+                BottomAppBar(modifier = Modifier.height(75.dp)) {
                     Box(
-                        modifier = Modifier//.height(85.dp)
+                        modifier = Modifier//.height(75.dp)
                             .verticalScroll(rememberScrollState())//.padding(horizontal = 16.dp)
                     ) {
                         Text(
@@ -213,6 +215,7 @@ fun titleForRoute(route: String?): String {
         route == Routes.Add::class.qualifiedName -> "Add a Card"
         route == Routes.Search::class.qualifiedName -> "Search Cards"
         route == Routes.LogIn::class.qualifiedName -> "Log In"
+        route == Routes.Backup::class.qualifiedName -> "Backup"
 
         //for routes with arguments (like CardDetail), the route string will be
         //"com.example...Routes.CardDetail/{cardId}"

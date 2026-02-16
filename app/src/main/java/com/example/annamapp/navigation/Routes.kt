@@ -24,6 +24,9 @@ sealed interface Routes {
     data object LogIn: Routes
 
     @Serializable
+    data object Backup: Routes
+
+    @Serializable
     data class SearchResults(
         val englishQuery: String,
         val englishEnabled: Boolean,

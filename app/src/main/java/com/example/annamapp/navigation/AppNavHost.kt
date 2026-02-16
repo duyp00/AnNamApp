@@ -12,6 +12,7 @@ import com.example.annamapp.room_sqlite_db.FlashCardDao
 import com.example.annamapp.screens.AddCardScreen
 import com.example.annamapp.screens.CardDetailScreen
 import com.example.annamapp.screens.HomeScreen
+import com.example.annamapp.screens.BackupScreen
 import com.example.annamapp.screens.LogInScreen
 import com.example.annamapp.screens.SearchResultScreen
 import com.example.annamapp.screens.SearchScreen
@@ -20,8 +21,6 @@ import com.example.annamapp.screens.loadAudioFileFromDiskForText
 import com.example.annamapp.networking.NetworkService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-
-//import com.example.annamapp.navigation.Routes.*
 
 @Composable
 fun AppNavHost(
@@ -37,7 +36,7 @@ fun AppNavHost(
         flashCardDao.insertAll(it)
     }
     val updateFlashCard: suspend (FlashCard, String, String) -> Unit = {
-    flashcard, enInitial, vnInitial ->
+            flashcard, enInitial, vnInitial ->
         flashCardDao.updateCard(flashcard)
         if (enInitial != flashcard.englishCard) {
             val oldAudioFile = loadAudioFileFromDiskForText(
@@ -92,6 +91,7 @@ fun AppNavHost(
                 onNavigateToAdd = { navCtrller.navigate(Routes.Add) },
                 onNavigateToSearch = { navCtrller.navigate(Routes.Search) },
                 onNavigateToLogIn = { navCtrller.navigate(Routes.LogIn) },
+                onNavigateToBackup = { navCtrller.navigate(Routes.Backup) },
                 onMessageChange = onMessageChange
             )
         }
@@ -129,6 +129,13 @@ fun AppNavHost(
                     inclusive = false,
                     saveState = false
                 ) }
+            )
+        }
+
+        composable<Routes.Backup> {
+            BackupScreen(
+                flashCardDao = flashCardDao,
+                onMessageChange = onMessageChange
             )
         }
 

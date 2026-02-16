@@ -28,6 +28,7 @@ fun HomeScreen(
     onNavigateToAdd: () -> Unit,
     onNavigateToSearch: () -> Unit,
     onNavigateToLogIn: () -> Unit,
+    onNavigateToBackup: () -> Unit,
     onMessageChange: (String) -> Unit = {}
 ) {
     //val scope = rememberCoroutineScope()
@@ -96,6 +97,16 @@ fun HomeScreen(
                 }
         ) {
             Text("Search Cards")
+        }
+
+        Button(
+            onClick = onNavigateToBackup,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                .semantics {
+                    contentDescription = "navigateToBackupManager"
+                }
+        ) {
+            Text("Backup manager")
         }
 
         Button(

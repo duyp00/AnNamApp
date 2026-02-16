@@ -189,7 +189,7 @@ fun CardDetailScreen(
                             val audioFile = remember { fileLoad.file }
                             var enableExport by rememberSaveable { mutableStateOf(false) }
                             if (enableExport) {
-                                SAFLauncher(
+                                SAFexportLauncher(
                                     file = audioFile,
                                     context = context,
                                     onDone = { msg ->
@@ -292,7 +292,7 @@ fun exportFile(
 }
 
 @Composable
-fun SAFLauncher(
+fun SAFexportLauncher(
     file: File,
     context: Context,
     onDone: (String) -> Unit
