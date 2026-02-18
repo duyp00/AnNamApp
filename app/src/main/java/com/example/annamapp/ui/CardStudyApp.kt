@@ -87,7 +87,7 @@ fun CardStudyApp(
             val widthDp: Int = configuration.screenWidthDp
             ModalDrawerSheet(
                 //prevent filling whole screen on smaller devices
-                modifier = Modifier.width((widthDp * 0.7).dp)
+                modifier = Modifier.width((widthDp * 0.7).dp).verticalScroll(rememberScrollState())
             ) {
                 Text(
                     "Navigate to",

@@ -118,8 +118,7 @@ fun BackupScreen(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
             .padding(16.dp)
             .verticalScroll(rememberScrollState()),
         //verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -153,10 +152,11 @@ fun BackupScreen(
                         val selectedRows = selectedImportIndexes.map { parsedImportRows[it] }
                         //val existingRows = flashCardDao.getAll()
                         //val rowsToInsert = getRowsToImport(existingRows, selectedRows)
+                        //-1L is returned by Room when an insert operation fails (e.g., due to a conflict or constraint violation).
                         val rowsToInsert = selectedRows
                         var insertCount = 0
                         if (rowsToInsert.isNotEmpty()) {
-                            insertCount = flashCardDao.insertAll(*rowsToInsert.toTypedArray()).size
+                            insertCount = flashCardDao.insertAll(*rowsToInsert.toTypedArray()).count { it != -1L }
                             databaseRows = flashCardDao.getAll()
                             selectedExportIds.clear()
                             selectedExportIds.addAll(databaseRows.map { it.uid })
@@ -213,7 +213,7 @@ fun CardsSelectPreview(
     HorizontalDivider(modifier = Modifier.padding(vertical = 5.dp))
 }
 
-val backupJson = Json { ignoreUnknownKeys = false }
+val backupJson = Json { ignoreUnknownKeys = true }
 
 fun parseAndValidateBackupRows(content: String): List<FlashCard>? {
     val root: JsonElement = runCatching { backupJson.parseToJsonElement(content) }.getOrNull() ?: return null
