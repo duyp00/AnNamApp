@@ -71,7 +71,7 @@ fun CardStudyApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     // 2. Get the qualified name of the home route.
     // e.g., "com.example.annamapp.navigation.Routes.Home"
-    val homeRouteString = Routes.Home::class.qualifiedName
+    val homeRouteString = Routes.Home::class.qualifiedName!!
     // 3. Get the current route as a STRING.
     val currentRouteString = navBackStackEntry?.destination?.route
 
@@ -100,7 +100,7 @@ fun CardStudyApp(
                     "Add" to Routes.Add,
                     "Search" to Routes.Search,
                     "Backup" to Routes.Backup,
-                    "Log In" to Routes.LogIn
+                    "Log In" to Routes.LogIn(currentRouteString ?: homeRouteString)
                 )
                 drawerItems.forEach { (label, route) ->
                     NavigationDrawerItem(
@@ -214,13 +214,13 @@ fun titleForRoute(route: String?): String {
         route == Routes.Study::class.qualifiedName -> "Study Cards"
         route == Routes.Add::class.qualifiedName -> "Add a Card"
         route == Routes.Search::class.qualifiedName -> "Search Cards"
-        route == Routes.LogIn::class.qualifiedName -> "Log In"
         route == Routes.Backup::class.qualifiedName -> "Backup"
 
-        //for routes with arguments (like CardDetail), the route string will be
-        //"com.example...Routes.CardDetail/{cardId}"
+        //for routes with arguments, the route string will be
+        //"com.example...<T>/{<arg1>}/{<arg2>}"
         //so check if the string *starts with* the class name.
-        //non-null assert is used because it's always not null in this case
+        //non-null assert can be used because it's always not null in this case
+        route?.startsWith(Routes.LogIn::class.qualifiedName!!) ?: false -> "Log In"
         route?.startsWith(Routes.SearchResults::class.qualifiedName!!) ?: false -> "Search Results"
         route?.startsWith(Routes.CardDetail::class.qualifiedName!!) ?: false -> "Card Details"
 

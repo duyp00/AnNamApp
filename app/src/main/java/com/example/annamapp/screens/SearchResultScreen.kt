@@ -53,11 +53,11 @@ fun SearchResultScreen(
 
     DisposableEffect(Unit) {
         onDispose {
-            hasLoaded = false //reset load state when leaving screen to ensure fresh data when returning
+            hasLoaded = false //reset load state when leaving screen to ensure fresh data when returning with state restoration from navigation drawer
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(hasLoaded) {
         //key1 = filters would also work, but filters only change when navigating to this screen
         if (!hasLoaded) { //if want to see changes after updating cards, disable this guard,
             refresh()     //but huge performance drop if DB is large just to navigate back
@@ -87,7 +87,7 @@ fun SearchResultScreen(
                         }*/
                         deleteCards(toDelete)
                         onMessageChange("Deleted ${toDelete.size} card(s)")
-                        refresh()
+                        hasLoaded = false //refresh()
                         selectedCardIds = setOf() //clear selection after deletion
                     }
                 }

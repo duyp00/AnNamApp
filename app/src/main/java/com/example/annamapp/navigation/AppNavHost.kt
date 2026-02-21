@@ -3,6 +3,7 @@ package com.example.annamapp.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -90,7 +91,7 @@ fun AppNavHost(
                 onNavigateToStudy = { navCtrller.navigate(Routes.Study) },
                 onNavigateToAdd = { navCtrller.navigate(Routes.Add) },
                 onNavigateToSearch = { navCtrller.navigate(Routes.Search) },
-                onNavigateToLogIn = { navCtrller.navigate(Routes.LogIn) },
+                onNavigateToLogIn = { navCtrller.navigate(Routes.LogIn()) },
                 onNavigateToBackup = { navCtrller.navigate(Routes.Backup) },
                 onMessageChange = onMessageChange
             )
@@ -120,15 +121,27 @@ fun AppNavHost(
             )
         }
 
-        composable<Routes.LogIn> {
+        composable<Routes.LogIn> { backStackEntry ->
+            val args = backStackEntry.toRoute<Routes.LogIn>()
             LogInScreen(
                 onMessageChange = onMessageChange,
                 //networkService = networkService,
-                onNavigateHome = { navCtrller.popBackStack(
-                    route = Routes.Home,
-                    inclusive = false,
-                    saveState = false
-                ) }
+                onNavigateToPrevious = {
+                    var previousScreen = args.previousRoute
+                    if (previousScreen.startsWith(Routes.SearchResults::class.qualifiedName!!) ||
+                        previousScreen.startsWith(Routes.CardDetail::class.qualifiedName!!)
+                    ) { previousScreen = Routes.Search::class.qualifiedName!! }
+                    navCtrller.navigate(previousScreen) {
+                        popUpTo(navCtrller.graph.findStartDestination().id) //{ saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                    /*navCtrller.popBackStack(
+                        route = args.previousRoute,
+                        inclusive = false,
+                        saveState = false
+                    )*/
+                }
             )
         }
 

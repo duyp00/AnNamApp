@@ -21,7 +21,7 @@ sealed interface Routes {
     data object Search: Routes
 
     @Serializable
-    data object LogIn: Routes
+    data class LogIn(val previousRoute: String = Home::class.qualifiedName!!): Routes
 
     @Serializable
     data object Backup: Routes

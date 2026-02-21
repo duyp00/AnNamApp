@@ -32,7 +32,7 @@ import kotlinx.coroutines.withContext
 fun LogInScreen(
     onMessageChange: (String) -> Unit = {},
     //networkService: NetworkService,
-    onNavigateHome: () -> Unit
+    onNavigateToPrevious: () -> Unit
 ) {
     LaunchedEffect(Unit) {
         onMessageChange("get tokens to log in")
@@ -96,7 +96,7 @@ fun LogInScreen(
                             }
                         }
                         //onMessageChange("Logged in")
-                        onNavigateHome()
+                        onNavigateToPrevious()
                     }
                 },
                 modifier = Modifier.semantics { contentDescription = "LogIn" }

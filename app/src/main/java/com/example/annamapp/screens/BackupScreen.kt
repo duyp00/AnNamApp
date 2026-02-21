@@ -61,7 +61,7 @@ fun BackupScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(hasLoaded) {
         if (!hasLoaded) {
             databaseRows = flashCardDao.getAll()
             selectedExportIds.clear()
@@ -157,9 +157,7 @@ fun BackupScreen(
                         var insertCount = 0
                         if (rowsToInsert.isNotEmpty()) {
                             insertCount = flashCardDao.insertAll(*rowsToInsert.toTypedArray()).count { it != -1L }
-                            databaseRows = flashCardDao.getAll()
-                            selectedExportIds.clear()
-                            selectedExportIds.addAll(databaseRows.map { it.uid })
+                            hasLoaded = false
                         }
                         onMessageChange("Imported $insertCount new row(s).")
                     }
